@@ -6,6 +6,9 @@ pub enum Source_Language
     C,
     Cpp,
     CSharp,
+    JavaScript,
+    TypeScript,
+    Shell,
     Generic
 }
 
@@ -22,12 +25,34 @@ impl Source_Language
             return Source_Language::Cpp;
         }
         if Lower.ends_with(".c") || Lower.ends_with(".h") { return Source_Language::C; }
+        if Lower.ends_with(".ts") || Lower.ends_with(".tsx") || Lower.ends_with(".mts") || Lower.ends_with(".cts")
+        {
+            return Source_Language::TypeScript;
+        }
+        if Lower.ends_with(".js") || Lower.ends_with(".jsx") || Lower.ends_with(".mjs") || Lower.ends_with(".cjs")
+        {
+            return Source_Language::JavaScript;
+        }
+        if Lower.ends_with(".sh") || Lower.ends_with(".bash") || Lower.ends_with(".zsh") || Lower.ends_with(".ksh")
+        {
+            return Source_Language::Shell;
+        }
         Source_Language::Generic
     }
 
     pub fn SupportsAngleGenerics(&self) -> bool
     {
-        matches!(self, Source_Language::Cpp | Source_Language::CSharp)
+        matches!(self, Source_Language::Cpp | Source_Language::CSharp | Source_Language::TypeScript)
+    }
+
+    pub fn IsJavaScriptOrTypeScript(&self) -> bool
+    {
+        matches!(self, Source_Language::JavaScript | Source_Language::TypeScript)
+    }
+
+    pub fn IsShell(&self) -> bool
+    {
+        matches!(self, Source_Language::Shell)
     }
 }
 
@@ -73,6 +98,8 @@ pub enum Token_Kind
     Number(String),
     String_Lit(String),
     Char_Lit(String),
+    Template_Lit(String),
+    Regex_Lit(String),
     Comment_Line(String),
     Comment_Block(String),
     Preprocessor(String),

@@ -12,6 +12,11 @@ impl Source_Formatter
 {
     pub fn Format(Source: &str, Config: &Config_Settings) -> Result<String, String>
     {
+        if Config.Language.IsJavaScriptOrTypeScript()
+        {
+            return crate::js_ts::JS_TS_Formatter::Format(Source, Config);
+        }
+
         let mut Scanner = Lexer_Scanner::New(Source, Config.Language);
         let Tokens = Scanner.TokenizeAll();
 

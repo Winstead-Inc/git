@@ -7,6 +7,7 @@ mod planner;
 mod emitter;
 mod verifier;
 mod formatter;
+mod js_ts;
 
 use std::env;
 use std::fs;
@@ -70,7 +71,7 @@ fn PrintUsage()
     println!("  -c, --canvas-width <WIDTH>  Set maximum canvas width before expansion (default: 160)");
     println!("  -i, --indent <SIZE>         Set indentation width in spaces (default: 4)");
     println!("  -t, --tabs                  Use tabs instead of spaces for indentation");
-    println!("  -l, --language <LANG>       Force source language: 'c', 'cpp', 'csharp'");
+    println!("  -l, --language <LANG>       Force source language: 'c', 'cpp', 'csharp', 'js', 'ts'");
     println!("      --max-statements <NUM>  Max statements in a monolith block (default: 4)");
     println!("      --stdin-filepath <PATH> Virtual filepath when formatting stdin");
     println!("  -h, --help                  Show this help message");
@@ -453,6 +454,8 @@ fn Main()
                         "c" => Source_Language::C,
                         "cpp" | "c++" => Source_Language::Cpp,
                         "cs" | "csharp" | "c#" => Source_Language::CSharp,
+                        "js" | "javascript" => Source_Language::JavaScript,
+                        "ts" | "typescript" => Source_Language::TypeScript,
                         _ => Source_Language::Generic
                     };
                 }
