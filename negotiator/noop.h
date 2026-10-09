@@ -3,6 +3,5 @@
 
 struct fetch_negotiator;
 
-void noop_negotiator_init(struct fetch_negotiator *negotiator);
-
+void noop_negotiator_init(struct fetch_negotiator * negotiator);
 #endif

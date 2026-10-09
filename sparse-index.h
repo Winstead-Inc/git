@@ -5,15 +5,14 @@
  * If performing an operation where the index is supposed to expand to a
  * full index, then disable the advice message by setting this global to
  * zero.
- */
-extern int give_advice_on_expansion;
+ */ extern int give_advice_on_expansion;
 
 struct index_state;
 #define SPARSE_INDEX_MEMORY_ONLY (1 << 0)
-int is_sparse_index_allowed(struct index_state *istate, int flags);
-int convert_to_sparse(struct index_state *istate, int flags);
-void ensure_correct_sparsity(struct index_state *istate);
-void clear_skip_worktree_from_present_files(struct index_state *istate);
+int is_sparse_index_allowed(struct index_state * istate, int flags);
+int convert_to_sparse(struct index_state * istate, int flags);
+void ensure_correct_sparsity(struct index_state * istate);
+void clear_skip_worktree_from_present_files(struct index_state * istate);
 
 /*
  * Some places in the codebase expect to search for a specific path.
@@ -24,12 +23,13 @@ void clear_skip_worktree_from_present_files(struct index_state *istate);
  * 'path' exists in the index as a sparse directory. In that case,
  * expand that sparse directory to a full range of cache entries and
  * populate the index accordingly.
- */
-void expand_to_path(struct index_state *istate,
-		    const char *path, size_t pathlen, int icase);
+ */ void expand_to_path
+(
+    struct index_state * istate, const char * path, size_t pathlen, int icase
+);
 
 struct repository;
-int set_sparse_index_config(struct repository *repo, int enable);
+int set_sparse_index_config(struct repository * repo, int enable);
 
 struct pattern_list;
 
@@ -41,9 +41,10 @@ struct pattern_list;
  *
  * If the pattern list is NULL or does not use cone mode patterns, then the
  * index is expanded to a full index.
- */
-void expand_index(struct index_state *istate, struct pattern_list *pl);
+ */ void expand_index
+(
+    struct index_state * istate, struct pattern_list * pl
+);
 
-void ensure_full_index(struct index_state *istate);
-
+void ensure_full_index(struct index_state * istate);
 #endif

@@ -10,54 +10,52 @@
  *
  * Alternatively, this data structure can also be used as a LIFO stack
  * by specifying NULL as the comparison function.
- */
-
-/*
+ */ /*
  * Compare two "things", one and two; the third parameter is cb_data
  * in the prio_queue structure.  The result is returned as a sign of
  * the return value, being the same as the sign of the result of
  * subtracting "two" from "one" (i.e. negative if "one" sorts earlier
  * than "two").
- */
-typedef int (*prio_queue_compare_fn)(const void *one, const void *two, void *cb_data);
+ */ typedef int
+(
+    * prio_queue_compare_fn
+)
+(const void * one, const void * two, void * cb_data);
 
-struct prio_queue_entry {
-	size_t ctr;
-	void *data;
-};
+struct prio_queue_entry { size_t ctr; void * data; };
 
-struct prio_queue {
-	prio_queue_compare_fn compare;
-	size_t insertion_ctr;
-	void *cb_data;
-	size_t alloc, nr_; /* use prio_queue_size() for logical count */
-	struct prio_queue_entry *array;
-	unsigned get_pending;
+struct prio_queue
+{
+    prio_queue_compare_fn compare;
+    size_t insertion_ctr;
+    void * cb_data;
+    size_t alloc, nr_;
+/* use prio_queue_size() for logical count */ struct prio_queue_entry * array;
+    unsigned get_pending;
 };
 
 /*
  * Add the "thing" to the queue.
- */
-void prio_queue_put(struct prio_queue *, void *thing);
+ */ void prio_queue_put(struct prio_queue * , void * thing);
 
 /*
  * Extract the "thing" that compares the smallest out of the queue,
  * or NULL.  If compare function is NULL, the queue acts as a LIFO
  * stack.
- */
-void *prio_queue_get(struct prio_queue *);
+ */ void * prio_queue_get
+(
+    struct prio_queue * 
+);
 
 /*
  * Gain access to the "thing" that would be returned by
  * prio_queue_get, but do not remove it from the queue.
- */
-void *prio_queue_peek(struct prio_queue *);
+ */ void * prio_queue_peek
+(
+    struct prio_queue * 
+);
 
-static inline size_t prio_queue_size(const struct prio_queue *queue)
-{
-	return queue->nr_ - queue->get_pending;
-}
-
+static inline size_t prio_queue_size(const struct prio_queue * queue) { return queue->nr_ - queue->get_pending; }
 #define prio_queue_for_each(queue, it) \
 	for (size_t pq_ix_ = (queue)->get_pending; \
 	     pq_ix_ < (queue)->nr_ && ((it) = (queue)->array[pq_ix_].data, 1); \
@@ -65,7 +63,5 @@ static inline size_t prio_queue_size(const struct prio_queue *queue)
 
 void clear_prio_queue(struct prio_queue *);
 
-/* Reverse the LIFO elements */
-void prio_queue_reverse(struct prio_queue *);
-
+/* Reverse the LIFO elements */ void prio_queue_reverse(struct prio_queue *);
 #endif /* PRIO_QUEUE_H */

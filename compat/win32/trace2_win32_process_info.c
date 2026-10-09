@@ -1,5 +1,4 @@
 #define USE_THE_REPOSITORY_VARIABLE
-
 #include "../../git-compat-util.h"
 #include "../../json-writer.h"
 #include "../../repository.h"
@@ -18,18 +17,15 @@
 /*
  * Find the process data for the given PID in the given snapshot
  * and update the PROCESSENTRY32 data.
- */
-static int find_pid(DWORD pid, HANDLE hSnapshot, PROCESSENTRY32 *pe32)
+ */ static int find_pid
+(
+    DWORD pid, HANDLE hSnapshot, PROCESSENTRY32 * pe32
+)
 {
-	pe32->dwSize = sizeof(PROCESSENTRY32);
+    pe32->dwSize = sizeof(PROCESSENTRY32);
 
-	if (Process32First(hSnapshot, pe32)) {
-		do {
-			if (pe32->th32ProcessID == pid)
-				return 1;
-		} while (Process32Next(hSnapshot, pe32));
-	}
-	return 0;
+    if (Process32First(hSnapshot, pe32)) { do { if (pe32->th32ProcessID == pid) return 1; } while (Process32Next(hSnapshot, pe32)); }
+    return 0;
 }
 
 /*
@@ -68,49 +64,41 @@ static int find_pid(DWORD pid, HANDLE hSnapshot, PROCESSENTRY32 *pe32)
  * We use a fixed-size array rather than ALLOC_GROW to keep things
  * simple and avoid the alloc/realloc overhead.  It is OK if we
  * truncate the search and return a partial answer.
- */
-static void get_processes(struct strvec *names, HANDLE hSnapshot)
+ */ static void get_processes
+(
+    struct strvec * names, HANDLE hSnapshot
+)
 {
-	PROCESSENTRY32 pe32;
-	DWORD pid;
-	DWORD pid_list[NR_PIDS_LIMIT];
-	int k, nr_pids = 0;
+    PROCESSENTRY32 pe32;
+    DWORD pid;
+    DWORD pid_list[NR_PIDS_LIMIT];
+    int k, nr_pids = 0;
 
-	pid = GetCurrentProcessId();
-	while (find_pid(pid, hSnapshot, &pe32)) {
-		/* Only report parents. Omit self from the output. */
-		if (nr_pids)
-			strvec_push(names, pe32.szExeFile);
+    pid = GetCurrentProcessId(); while (find_pid(pid, hSnapshot, & pe32))
+    {
+        /* Only report parents. Omit self from the output. */ if (nr_pids) strvec_push(names, pe32.szExeFile);
 
-		/* Check for cycle in snapshot. (Yes, it happened.) */
-		for (k = 0; k < nr_pids; k++)
-			if (pid == pid_list[k]) {
-				strvec_push(names, "(cycle)");
-				return;
-			}
+        /* Check for cycle in snapshot. (Yes, it happened.) */ for (k = 0; k < nr_pids; k ++) if (pid == pid_list[k])
+        {
+            strvec_push(names, "(cycle)");
+            return ;
+        }
 
-		if (nr_pids == NR_PIDS_LIMIT) {
-			strvec_push(names, "(truncated)");
-			return;
-		}
+        if (nr_pids == NR_PIDS_LIMIT) { strvec_push(names, "(truncated)"); return ; }
 
-		pid_list[nr_pids++] = pid;
+        pid_list[nr_pids ++] = pid;
 
-		pid = pe32.th32ParentProcessID;
-	}
+        pid = pe32.th32ParentProcessID;
+    }
 }
 
 /*
  * Collect the list of parent process names.
- */
-static void get_ancestry(struct strvec *names)
+ */ static void get_ancestry(struct strvec * names)
 {
-	HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 
-	if (hSnapshot != INVALID_HANDLE_VALUE) {
-		get_processes(names, hSnapshot);
-		CloseHandle(hSnapshot);
-	}
+    if (hSnapshot != INVALID_HANDLE_VALUE) { get_processes(names, hSnapshot); CloseHandle(hSnapshot); }
 }
 
 /*
@@ -120,84 +108,73 @@ static void get_ancestry(struct strvec *names)
  * This is the normal case.  Since this code is called during our startup,
  * it will not report instances where a debugger is attached dynamically
  * to a running git process, but that is relatively rare.
- */
-static void get_is_being_debugged(void)
-{
-	if (IsDebuggerPresent())
-		trace2_data_intmax("process", the_repository,
-				   "windows/debugger_present", 1);
-}
+ */ static void get_is_being_debugged
+(
+    void
+)
+{ if (IsDebuggerPresent()) trace2_data_intmax("process", the_repository, "windows/debugger_present", 1); }
 
 /*
  * Emit JSON data with the peak memory usage of the current process.
- */
-static void get_peak_memory_info(void)
+ */ static void get_peak_memory_info(void)
 {
-	DECLARE_PROC_ADDR(psapi.dll, BOOL, WINAPI, GetProcessMemoryInfo,
-			  HANDLE, PPROCESS_MEMORY_COUNTERS, DWORD);
+    DECLARE_PROC_ADDR(psapi.dll, BOOL, WINAPI, GetProcessMemoryInfo, HANDLE, PPROCESS_MEMORY_COUNTERS, DWORD);
 
-	if (INIT_PROC_ADDR(GetProcessMemoryInfo)) {
-		PROCESS_MEMORY_COUNTERS pmc;
+    if (INIT_PROC_ADDR(GetProcessMemoryInfo))
+    {
+        PROCESS_MEMORY_COUNTERS pmc;
 
-		if (GetProcessMemoryInfo(GetCurrentProcess(), &pmc,
-					 sizeof(pmc))) {
-			struct json_writer jw = JSON_WRITER_INIT;
+        if (GetProcessMemoryInfo(GetCurrentProcess(), & pmc, sizeof (pmc)))
+        {
+            struct json_writer jw = JSON_WRITER_INIT;
 
-			jw_object_begin(&jw, 0);
-
+            jw_object_begin( & jw, 0);
 #define KV(kv) #kv, (intmax_t)pmc.kv
 
-			jw_object_intmax(&jw, KV(PageFaultCount));
-			jw_object_intmax(&jw, KV(PeakWorkingSetSize));
-			jw_object_intmax(&jw, KV(PeakPagefileUsage));
+            jw_object_intmax( & jw, KV(PageFaultCount));
+            jw_object_intmax( & jw, KV(PeakWorkingSetSize));
+            jw_object_intmax( & jw, KV(PeakPagefileUsage));
 
-			jw_end(&jw);
+            jw_end( & jw);
 
-			trace2_data_json("process", the_repository,
-					 "windows/memory", &jw);
-			jw_release(&jw);
-		}
-	}
+            trace2_data_json("process", the_repository, "windows/memory", & jw);
+            jw_release( & jw);
+        }
+    }
 }
 
 void trace2_collect_process_info(enum trace2_process_info_reason reason)
 {
-	struct strvec names = STRVEC_INIT;
+    struct strvec names = STRVEC_INIT;
 
-	if (!trace2_is_enabled())
-		return;
+    if ( ! trace2_is_enabled()) return ;
 
-	switch (reason) {
-	case TRACE2_PROCESS_INFO_STARTUP:
-		get_is_being_debugged();
-		get_ancestry(&names);
-		if (names.nr) {
-			/*
+    switch (reason)
+    {
+        case TRACE2_PROCESS_INFO_STARTUP: get_is_being_debugged();
+        get_ancestry( & names);
+        if (names.nr)
+        {
+            /*
 			  Emit the ancestry data as a data_json event to
 			  maintain compatibility for consumers of the older
 			  "windows/ancestry" event.
-			 */
-			struct json_writer jw = JSON_WRITER_INIT;
-			jw_array_begin(&jw, 0);
-			for (size_t i = 0; i < names.nr; i++)
-				jw_array_string(&jw, names.v[i]);
-			jw_end(&jw);
-			trace2_data_json("process", the_repository,
-					 "windows/ancestry", &jw);
-			jw_release(&jw);
+			 */ struct json_writer jw = JSON_WRITER_INIT;
+            jw_array_begin( & jw, 0);
+            for (size_t i = 0; i < names.nr; i ++) jw_array_string( & jw, names.v[i]);
+            jw_end( & jw);
+            trace2_data_json("process", the_repository, "windows/ancestry", & jw);
+            jw_release( & jw);
 
-			/* Emit the ancestry data with the new event. */
-			trace2_cmd_ancestry(names.v);
-		}
+            /* Emit the ancestry data with the new event. */ trace2_cmd_ancestry(names.v);
+        }
 
-		strvec_clear(&names);
-		return;
+        strvec_clear( & names);
+        return ;
 
-	case TRACE2_PROCESS_INFO_EXIT:
-		get_peak_memory_info();
-		return;
+        case TRACE2_PROCESS_INFO_EXIT: get_peak_memory_info();
+        return ;
 
-	default:
-		BUG("trace2_collect_process_info: unknown reason '%d'", reason);
-	}
+        default: BUG("trace2_collect_process_info: unknown reason '%d'", reason);
+    }
 }

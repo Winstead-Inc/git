@@ -5,7 +5,6 @@
 #ifndef COMMIT_SLAB_SIZE
 #define COMMIT_SLAB_SIZE (512*1024-32)
 #endif
-
 #define declare_commit_slab(slabname, elemtype) 			\
 									\
 struct slabname {							\
@@ -26,7 +25,6 @@ struct slabname {							\
 	COMMIT_SLAB_SIZE / sizeof(**((var).slab)) / (stride), \
 	(stride), 0, NULL \
 }
-
 #define declare_commit_slab_prototypes(slabname, elemtype)		\
 									\
 void init_ ##slabname## _with_stride(struct slabname *s, unsigned stride); \
@@ -36,9 +34,7 @@ void deep_clear_ ##slabname(struct slabname *s, void (*free_fn)(elemtype *ptr));
 elemtype *slabname## _at_peek(struct slabname *s, const struct commit *c, int add_if_missing); \
 elemtype *slabname## _at(struct slabname *s, const struct commit *c);	\
 elemtype *slabname## _peek(struct slabname *s, const struct commit *c)
-
 #define define_shared_commit_slab(slabname, elemtype) \
 	declare_commit_slab(slabname, elemtype); \
 	declare_commit_slab_prototypes(slabname, elemtype)
-
 #endif /* COMMIT_SLAB_DECL_H */

@@ -1,6 +1,5 @@
 #ifndef TRACE_H
 #define TRACE_H
-
 #include "strbuf.h"
 
 /**
@@ -59,9 +58,7 @@
  * GIT_TRACE_PERFORMANCE=/path/to/log/file git log -1
  * ------------
  *
- */
-
-/**
+ */ /**
  * Defines a trace key (or category). The default (for API functions that
  * don't take a key) is `GIT_TRACE`.
  *
@@ -78,41 +75,43 @@
  *
  * Note: don't use `const` as the trace implementation stores internal state in
  * the `trace_key` structure.
- */
-struct trace_key {
-	const char * const key;
-	int fd;
-	unsigned int initialized : 1;
-	unsigned int  need_close : 1;
+ */ struct trace_key
+{
+    const char * const key;
+    int fd;
+    unsigned int initialized: 1;
+    unsigned int need_close: 1;
 };
 
 extern struct trace_key trace_default_key;
-
 #define TRACE_KEY_INIT(name) { .key = "GIT_TRACE_" #name }
 extern struct trace_key trace_perf_key;
 extern struct trace_key trace_setup_key;
 
 struct repository;
 
-void trace_repo_setup(struct repository *r);
+void trace_repo_setup(struct repository * r);
 
 /**
  * Checks whether the trace key is enabled. Used to prevent expensive
  * string formatting before calling one of the printing APIs.
- */
-int trace_want(struct trace_key *key);
+ */ int trace_want
+(
+    struct trace_key * key
+);
 
 /**
  * Enables or disables tracing for the specified key, as if the environment
  * variable was set to the given value.
- */
-void trace_override_envvar(struct trace_key *key, const char *value);
+ */ void trace_override_envvar
+(
+    struct trace_key * key, const char * value
+);
 
 /**
  * Disables tracing for the specified key, even if the environment variable
  * was set.
- */
-void trace_disable(struct trace_key *key);
+ */ void trace_disable(struct trace_key * key);
 
 /**
  * Returns nanoseconds since the epoch (01/01/1970), typically used
@@ -120,11 +119,13 @@ void trace_disable(struct trace_key *key);
  * Currently there are high precision timer implementations for Linux (using
  * `clock_gettime(CLOCK_MONOTONIC)`) and Windows (`QueryPerformanceCounter`).
  * Other platforms use `gettimeofday` as time source.
- */
-uint64_t getnanotime(void);
+ */ uint64_t getnanotime
+(
+    void
+);
 
-void trace_command_performance(const char **argv);
-void trace_verbatim(struct trace_key *key, const void *buf, unsigned len);
+void trace_command_performance(const char ** argv);
+void trace_verbatim(struct trace_key * key, const void * buf, unsigned len);
 uint64_t trace_performance_enter(void);
 
 /*
@@ -157,9 +158,7 @@ uint64_t trace_performance_enter(void);
  *
  * which is invalid (note the ',)'). With GNUC, '##__VA_ARGS__' drops the
  * comma, but this is non-standard.
- */
-
-/**
+ */ /**
  * trace_printf(), accepts "const char *format, ...".
  *
  * Prints a formatted message, similar to printf.
@@ -256,24 +255,13 @@ uint64_t trace_performance_enter(void);
 						   __VA_ARGS__);	    \
 	} while (0)
 
-/* backend functions, use non-*fl macros instead */
-__attribute__((format (printf, 4, 5)))
-void trace_printf_key_fl(const char *file, int line, struct trace_key *key,
-			 const char *format, ...);
-__attribute__((format (printf, 4, 5)))
-void trace_argv_printf_fl(const char *file, int line, const char **argv,
-			  const char *format, ...);
-void trace_strbuf_fl(const char *file, int line, struct trace_key *key,
-		     const struct strbuf *data);
-__attribute__((format (printf, 4, 5)))
-void trace_performance_fl(const char *file, int line,
-			  uint64_t nanos, const char *fmt, ...);
-__attribute__((format (printf, 4, 5)))
-void trace_performance_leave_fl(const char *file, int line,
-				uint64_t nanos, const char *fmt, ...);
-static inline int trace_pass_fl(struct trace_key *key)
-{
-	return key->fd || !key->initialized;
-}
-
+/* backend functions, use non-*fl macros instead */ __attribute__((format(printf, 4, 5))) void trace_printf_key_fl
+(
+    const char * file, int line, struct trace_key * key, const char * format, ... 
+);
+__attribute__((format(printf, 4, 5))) void trace_argv_printf_fl(const char * file, int line, const char ** argv, const char * format, ...);
+void trace_strbuf_fl(const char * file, int line, struct trace_key * key, const struct strbuf * data);
+__attribute__((format(printf, 4, 5))) void trace_performance_fl(const char * file, int line, uint64_t nanos, const char * fmt, ...);
+__attribute__((format(printf, 4, 5))) void trace_performance_leave_fl(const char * file, int line, uint64_t nanos, const char * fmt, ...);
+static inline int trace_pass_fl(struct trace_key * key) { return key->fd || ! key->initialized; }
 #endif /* TRACE_H */

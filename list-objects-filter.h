@@ -46,21 +46,12 @@ struct repository;
  * but *may* be revisited (if the object appears again in the traversal).
  * Therefore, it will be omitted from the results *unless* a later
  * iteration causes it to be shown.
- */
-enum list_objects_filter_result {
-	LOFR_ZERO      = 0,
-	LOFR_MARK_SEEN = 1<<0,
-	LOFR_DO_SHOW   = 1<<1,
-	LOFR_SKIP_TREE = 1<<2,
+ */ enum list_objects_filter_result
+{
+    LOFR_ZERO = 0, LOFR_MARK_SEEN = 1 << 0, LOFR_DO_SHOW = 1 << 1, LOFR_SKIP_TREE = 1 << 2, 
 };
 
-enum list_objects_filter_situation {
-	LOFS_COMMIT,
-	LOFS_TAG,
-	LOFS_BEGIN_TREE,
-	LOFS_END_TREE,
-	LOFS_BLOB
-};
+enum list_objects_filter_situation { LOFS_COMMIT, LOFS_TAG, LOFS_BEGIN_TREE, LOFS_END_TREE, LOFS_BLOB };
 
 struct filter;
 
@@ -70,29 +61,27 @@ struct filter;
  * filter excludes. This set should not be considered finalized until
  * after list_objects_filter__free is called on the returned `struct
  * filter *`.
- */
-struct filter *list_objects_filter__init(
-	struct oidset *omitted,
-	struct list_objects_filter_options *filter_options);
+ */ struct filter * list_objects_filter__init
+(
+    struct oidset * omitted, struct list_objects_filter_options * filter_options
+);
 
 /*
  * Lets `filter` decide how to handle the `obj`. If `filter` is NULL, this
  * function behaves as expected if no filter is configured: all objects are
  * included.
- */
-enum list_objects_filter_result list_objects_filter__filter_object(
-	struct repository *r,
-	enum list_objects_filter_situation filter_situation,
-	struct object *obj,
-	const char *pathname,
-	const char *filename,
-	struct filter *filter);
+ */ enum list_objects_filter_result list_objects_filter__filter_object
+(
+    struct repository * r, enum list_objects_filter_situation filter_situation, struct object * obj, const char * pathname, const char * filename, struct filter * filter
+);
 
 /*
  * Destroys `filter` and finalizes the `omitted` set, if present. Does
  * nothing if `filter` is null.
- */
-void list_objects_filter__free(struct filter *filter);
+ */ void list_objects_filter__free
+(
+    struct filter * filter
+);
 
 /*
  * Given a set of OIDs in 'in', populate 'omitted' with those that
@@ -104,10 +93,8 @@ void list_objects_filter__free(struct filter *filter);
  * list-objects-filter.c.
  *
  * Return 0 on success, -1 if the filter is not supported.
- */
-int list_objects_filter__filter_oidset(struct repository *r,
-	const struct list_objects_filter_options *opts,
-	const struct oidset *in,
-	struct oidset *omitted);
-
+ */ int list_objects_filter__filter_oidset
+(
+    struct repository * r, const struct list_objects_filter_options * opts, const struct oidset * in, struct oidset * omitted
+);
 #endif /* LIST_OBJECTS_FILTER_H */

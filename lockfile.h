@@ -114,14 +114,9 @@
  * appropriately and return -1. The `commit` variants (but not `close`)
  * do their best to delete the temporary file before returning.
  */
-
 #include "tempfile.h"
 
-struct lock_file {
-	struct tempfile *tempfile;
-	struct tempfile *pid_tempfile;
-};
-
+struct lock_file { struct tempfile * tempfile; struct tempfile * pid_tempfile; };
 #define LOCK_INIT { 0 }
 
 /* String appended to a filename to derive the lockfile name: */
@@ -142,17 +137,14 @@ struct lock_file {
 /*
  * Whether to create PID files alongside lock files.
  * Configured via core.lockfilePid (boolean).
- */
-extern int lockfile_pid_enabled;
+ */ extern int lockfile_pid_enabled;
 
 /*
  * Flags
  * -----
  *
  * The following flags can be passed to `hold_lock_file_for_update()`.
- */
-
-/*
+ */ /*
  * If a lock is already taken for the file, `die()` with an error
  * message. If this flag is not specified, trying to lock a file that
  * is already locked silently returns -1 to the caller, or ...
@@ -184,91 +176,73 @@ extern int lockfile_pid_enabled;
  * timeout_ms milliseconds. If timeout_ms is 0, try exactly once; if
  * timeout_ms is -1, retry indefinitely. The flags argument, error
  * handling, and mode are described above.
- */
-int hold_lock_file_for_update_timeout_mode(
-	struct lock_file *lk, const char *path,
-	int flags, long timeout_ms, int mode);
+ */ int hold_lock_file_for_update_timeout_mode
+(
+    struct lock_file * lk, const char * path, int flags, long timeout_ms, int mode
+);
 
-int repo_hold_lock_file_for_update_timeout_mode(struct repository *r,
-						struct lock_file *lk,
-						const char *path, int flags,
-						long timeout_ms, int mode);
+int repo_hold_lock_file_for_update_timeout_mode(struct repository * r, struct lock_file * lk, const char * path, int flags, long timeout_ms, int mode);
 
-static inline int hold_lock_file_for_update_timeout(
-	struct lock_file *lk, const char *path,
-	int flags, long timeout_ms)
+static inline int hold_lock_file_for_update_timeout(struct lock_file * lk, const char * path, int flags, long timeout_ms)
 {
-	return hold_lock_file_for_update_timeout_mode(lk, path, flags,
-						      timeout_ms, 0666);
+    return hold_lock_file_for_update_timeout_mode(lk, path, flags, timeout_ms, 0666);
 }
 
-static inline int repo_hold_lock_file_for_update_timeout(struct repository *r,
-							 struct lock_file *lk,
-							 const char *path,
-							 int flags,
-							 long timeout_ms)
+static inline int repo_hold_lock_file_for_update_timeout(struct repository * r, struct lock_file * lk, const char * path, int flags, long timeout_ms)
 {
-	return repo_hold_lock_file_for_update_timeout_mode(r, lk, path, flags,
-							   timeout_ms, 0666);
+    return repo_hold_lock_file_for_update_timeout_mode(r, lk, path, flags, timeout_ms, 0666);
 }
 
 /*
  * Attempt to create a lockfile for the file at `path` and return a
  * file descriptor for writing to it, or -1 on error. The flags
  * argument and error handling are described above.
- */
-static inline int hold_lock_file_for_update(
-	struct lock_file *lk, const char *path, int flags)
+ */ static inline int hold_lock_file_for_update
+(
+    struct lock_file * lk, const char * path, int flags
+)
+{ return hold_lock_file_for_update_timeout(lk, path, flags, 0); }
+
+static inline int repo_hold_lock_file_for_update(struct repository * r, struct lock_file * lk, const char * path, int flags)
 {
-	return hold_lock_file_for_update_timeout(lk, path, flags, 0);
+    return repo_hold_lock_file_for_update_timeout(r, lk, path, flags, 0);
 }
 
-static inline int repo_hold_lock_file_for_update(struct repository *r,
-						 struct lock_file *lk,
-						 const char *path, int flags)
+static inline int hold_lock_file_for_update_mode(struct lock_file * lk, const char * path, int flags, int mode)
 {
-	return repo_hold_lock_file_for_update_timeout(r, lk, path, flags, 0);
+    return hold_lock_file_for_update_timeout_mode(lk, path, flags, 0, mode);
 }
 
-static inline int hold_lock_file_for_update_mode(
-	struct lock_file *lk, const char *path,
-	int flags, int mode)
+static inline int repo_hold_lock_file_for_update_mode(struct repository * r, struct lock_file * lk, const char * path, int flags, int mode)
 {
-	return hold_lock_file_for_update_timeout_mode(lk, path, flags, 0, mode);
-}
-
-static inline int repo_hold_lock_file_for_update_mode(struct repository *r,
-						      struct lock_file *lk,
-						      const char *path,
-						      int flags, int mode)
-{
-	return repo_hold_lock_file_for_update_timeout_mode(r, lk, path, flags,
-							   0, mode);
+    return repo_hold_lock_file_for_update_timeout_mode(r, lk, path, flags, 0, mode);
 }
 
 /*
  * Return a nonzero value iff `lk` is currently locked.
- */
-static inline int is_lock_file_locked(struct lock_file *lk)
+ */ static inline int is_lock_file_locked(struct lock_file * lk)
 {
-	return is_tempfile_active(lk->tempfile);
+    return is_tempfile_active(lk->tempfile);
 }
 
 /*
  * Append an appropriate error message to `buf` following the failure
  * of `hold_lock_file_for_update()` to lock `path`. `err` should be the
  * `errno` set by the failing call.
- */
-void unable_to_lock_message(const char *path, int err,
-			    struct strbuf *buf);
+ */ void unable_to_lock_message
+(
+    const char * path, int err, struct strbuf * buf
+);
 
 /*
  * Emit an appropriate error message and `die()` following the failure
  * of `hold_lock_file_for_update()` to lock `path`. `err` should be the
  * `errno` set by the failing
  * call.
- */
-NORETURN void unable_to_lock_die(const char *path, int err);
+ */ NORETURN void unable_to_lock_die
+(
+    const char * path, int err
+);
 
 /*
  * Associate a stdio stream with the lockfile (which must still be
@@ -276,36 +250,32 @@ NORETURN void unable_to_lock_die(const char *path, int err);
  * error. The stream is closed automatically when
  * `close_lock_file_gently()` is called or when the file is committed or
  * rolled back.
- */
-static inline FILE *fdopen_lock_file(struct lock_file *lk, const char *mode)
-{
-	return fdopen_tempfile(lk->tempfile, mode);
-}
+ */ static inline FILE * fdopen_lock_file
+(
+    struct lock_file * lk, const char * mode
+)
+{ return fdopen_tempfile(lk->tempfile, mode); }
 
 /*
  * Return the path of the lockfile. The return value is a pointer to a
  * field within the lock_file object and should not be freed.
- */
-static inline const char *get_lock_file_path(struct lock_file *lk)
-{
-	return get_tempfile_path(lk->tempfile);
-}
+ */ static inline const char * get_lock_file_path
+(
+    struct lock_file * lk
+)
+{ return get_tempfile_path(lk->tempfile); }
 
-static inline int get_lock_file_fd(struct lock_file *lk)
-{
-	return get_tempfile_fd(lk->tempfile);
-}
+static inline int get_lock_file_fd(struct lock_file * lk) { return get_tempfile_fd(lk->tempfile); }
 
-static inline FILE *get_lock_file_fp(struct lock_file *lk)
-{
-	return get_tempfile_fp(lk->tempfile);
-}
+static inline FILE * get_lock_file_fp(struct lock_file * lk) { return get_tempfile_fp(lk->tempfile); }
 
 /*
  * Return the path of the file that is locked by the specified
  * lock_file object. The caller must free the memory.
- */
-char *get_locked_file_path(struct lock_file *lk);
+ */ char * get_locked_file_path
+(
+    struct lock_file * lk
+);
 
 /*
  * If the lockfile is still open, close it (and the file pointer if it
@@ -314,11 +284,11 @@ char *get_locked_file_path(struct lock_file *lk);
  * failure to `close(2)`, return a negative value (the lockfile is not
  * rolled back). Usually `commit_lock_file()`, `commit_lock_file_to()`,
  * or `rollback_lock_file()` should eventually be called.
- */
-static inline int close_lock_file_gently(struct lock_file *lk)
-{
-	return close_tempfile_gently(lk->tempfile);
-}
+ */ static inline int close_lock_file_gently
+(
+    struct lock_file * lk
+)
+{ return close_tempfile_gently(lk->tempfile); }
 
 /*
  * Re-open a lockfile that has been closed using `close_lock_file_gently()`
@@ -338,11 +308,11 @@ static inline int close_lock_file_gently(struct lock_file *lk)
  *   contents. Write out the new contents.
  *
  * * `commit_lock_file()` to make the final version permanent.
- */
-static inline int reopen_lock_file(struct lock_file *lk)
-{
-	return reopen_tempfile(lk->tempfile);
-}
+ */ static inline int reopen_lock_file
+(
+    struct lock_file * lk
+)
+{ return reopen_tempfile(lk->tempfile); }
 
 /*
  * Commit the change represented by `lk`: close the file descriptor
@@ -352,24 +322,27 @@ static inline int reopen_lock_file(struct lock_file *lk)
  * from the failing call to `close(2)` or `rename(2)`. It is a bug to
  * call `commit_lock_file()` for a `lock_file` object that is not
  * currently locked.
- */
-int commit_lock_file(struct lock_file *lk);
+ */ int commit_lock_file
+(
+    struct lock_file * lk
+);
 
 /*
  * Like `commit_lock_file()`, but rename the lockfile to the provided
  * `path`. `path` must be on the same filesystem as the lock file.
- */
-static inline int commit_lock_file_to(struct lock_file *lk, const char *path)
-{
-	return rename_tempfile(&lk->tempfile, path);
-}
+ */ static inline int commit_lock_file_to
+(
+    struct lock_file * lk, const char * path
+)
+{ return rename_tempfile( & lk->tempfile, path); }
 
 /*
  * Roll back `lk`: close the file descriptor and/or file pointer and
  * remove the lockfile and any associated PID file. It is a NOOP to
  * call `rollback_lock_file()` for a `lock_file` object that has already
  * been committed or rolled back. No error will be returned in this case.
- */
-int rollback_lock_file(struct lock_file *lk);
-
+ */ int rollback_lock_file
+(
+    struct lock_file * lk
+);
 #endif /* LOCKFILE_H */

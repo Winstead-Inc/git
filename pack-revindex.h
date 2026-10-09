@@ -29,11 +29,8 @@
  *     pack), removing duplicates, and placing the preferred pack (if any)
  *     first.
  */
-
-
 #define RIDX_SIGNATURE 0x52494458 /* "RIDX" */
 #define RIDX_VERSION 1
-
 #define GIT_TEST_NO_WRITE_REV_INDEX "GIT_TEST_NO_WRITE_REV_INDEX"
 #define GIT_TEST_REV_INDEX_DIE_IN_MEMORY "GIT_TEST_REV_INDEX_DIE_IN_MEMORY"
 #define GIT_TEST_REV_INDEX_DIE_ON_DISK "GIT_TEST_REV_INDEX_DIE_ON_DISK"
@@ -48,24 +45,30 @@ struct repository;
  *
  * If a '.rev' file is present it is mmap'd, and pointers are assigned into it
  * (instead of using the in-memory variant).
- */
-int load_pack_revindex(struct repository *r, struct packed_git *p);
+ */ int load_pack_revindex
+(
+    struct repository * r, struct packed_git * p
+);
 
 /*
  * Specifically load a pack revindex from disk.
  *
  * Returns 0 on success, 1 on "no .rev file", and -1 when there is an
  * error parsing the .rev file.
- */
-int load_pack_revindex_from_disk(struct packed_git *p);
+ */ int load_pack_revindex_from_disk
+(
+    struct packed_git * p
+);
 
 /*
  * verify_pack_revindex verifies that the on-disk rev-index for the given
  * pack-file is the same that would be created if written from scratch.
  *
  * A negative number is returned on error.
- */
-int verify_pack_revindex(struct packed_git *p);
+ */ int verify_pack_revindex
+(
+    struct packed_git * p
+);
 
 /*
  * load_midx_revindex loads the '.rev' file corresponding to the given
@@ -74,15 +77,19 @@ int verify_pack_revindex(struct packed_git *p);
  *
  * A negative number is returned on error. A positive number is returned in
  * case the multi-pack-index does not have a reverse index.
- */
-int load_midx_revindex(struct multi_pack_index *m);
+ */ int load_midx_revindex
+(
+    struct multi_pack_index * m
+);
 
 /*
  * Frees resources associated with a multi-pack reverse index.
  *
  * A negative number is returned on error.
- */
-int close_midx_revindex(struct multi_pack_index *m);
+ */ int close_midx_revindex
+(
+    struct multi_pack_index * m
+);
 
 /*
  * offset_to_pack_pos converts an object offset to a pack position. This
@@ -93,8 +100,10 @@ int close_midx_revindex(struct multi_pack_index *m);
  * and returns an negative number if an error was encountered.
  *
  * This function runs in time O(log N) with the number of objects in the pack.
- */
-int offset_to_pack_pos(struct packed_git *p, off_t ofs, uint32_t *pos);
+ */ int offset_to_pack_pos
+(
+    struct packed_git * p, off_t ofs, uint32_t * pos
+);
 
 /*
  * pack_pos_to_index converts the given pack-relative position 'pos' by
@@ -104,8 +113,10 @@ int offset_to_pack_pos(struct packed_git *p, off_t ofs, uint32_t *pos);
  * bounds, this function aborts.
  *
  * This function runs in constant time.
- */
-uint32_t pack_pos_to_index(struct packed_git *p, uint32_t pos);
+ */ uint32_t pack_pos_to_index
+(
+    struct packed_git * p, uint32_t pos
+);
 
 /*
  * pack_pos_to_offset converts the given pack-relative position 'pos' into a
@@ -118,8 +129,10 @@ uint32_t pack_pos_to_index(struct packed_git *p, uint32_t pos);
  * This function runs in constant time under both in-memory and on-disk reverse
  * indexes, but an additional step is taken to consult the corresponding .idx
  * file when using the on-disk format.
- */
-off_t pack_pos_to_offset(struct packed_git *p, uint32_t pos);
+ */ off_t pack_pos_to_offset
+(
+    struct packed_git * p, uint32_t pos
+);
 
 /*
  * pack_pos_to_midx converts the object at position "pos" within the MIDX
@@ -129,8 +142,10 @@ off_t pack_pos_to_offset(struct packed_git *p, uint32_t pos);
  * bounds, this function aborts.
  *
  * This function runs in constant time.
- */
-uint32_t pack_pos_to_midx(struct multi_pack_index *m, uint32_t pos);
+ */ uint32_t pack_pos_to_midx
+(
+    struct multi_pack_index * m, uint32_t pos
+);
 
 /*
  * midx_to_pack_pos converts from the MIDX-relative position at "at" to the
@@ -140,10 +155,10 @@ uint32_t pack_pos_to_midx(struct multi_pack_index *m, uint32_t pos);
  * bounds, this function aborts.
  *
  * This function runs in time O(log N) with the number of objects in the MIDX.
- */
-int midx_to_pack_pos(struct multi_pack_index *midx, uint32_t at, uint32_t *pos);
+ */ int midx_to_pack_pos
+(
+    struct multi_pack_index * midx, uint32_t at, uint32_t * pos
+);
 
-int midx_pair_to_pack_pos(struct multi_pack_index *midx, uint32_t pack_id,
-			  off_t ofs, uint32_t *pos);
-
+int midx_pair_to_pack_pos(struct multi_pack_index * midx, uint32_t pack_id, off_t ofs, uint32_t * pos);
 #endif

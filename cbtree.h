@@ -15,42 +15,37 @@
 #define CBTREE_H
 
 struct cb_node;
-struct cb_node {
-	struct cb_node *child[2];
-	/*
+struct cb_node
+{
+    struct cb_node * child[2];
+    /*
 	 * n.b. uint32_t for `byte' is excessive for OIDs,
 	 * we may consider shorter variants if nothing else gets stored.
-	 */
-	uint32_t byte;
-	uint8_t otherbits;
+	 */ uint32_t byte;
+    uint8_t otherbits;
 };
 
-struct cb_tree {
-	struct cb_node *root;
-	ptrdiff_t key_offset;
-};
+struct cb_tree { struct cb_node * root; ptrdiff_t key_offset; };
 
-static inline void cb_init(struct cb_tree *t,
-			   ptrdiff_t key_offset)
+static inline void cb_init(struct cb_tree * t, ptrdiff_t key_offset)
 {
-	struct cb_tree blank = {
-		.key_offset = key_offset,
-	};
-	memcpy(t, &blank, sizeof(*t));
+    struct cb_tree blank = {.key_offset = key_offset, };
+    memcpy(t, & blank, sizeof ( * t));
 }
 
-struct cb_node *cb_lookup(struct cb_tree *, const uint8_t *k, size_t klen);
-struct cb_node *cb_insert(struct cb_tree *, struct cb_node *, size_t klen);
+struct cb_node * cb_lookup(struct cb_tree * , const uint8_t * k, size_t klen);
+struct cb_node * cb_insert(struct cb_tree * , struct cb_node * , size_t klen);
 
 /*
  * Callback invoked by `cb_each()` for each node in the critbit tree. A return
  * value of 0 will cause the iteration to continue, a non-zero return code will
  * cause iteration to abort. The error code will be relayed back from
  * `cb_each()` in that case.
- */
-typedef int (*cb_iter)(struct cb_node *, void *arg);
+ */ typedef int
+(
+    * cb_iter
+)
+(struct cb_node * , void * arg);
 
-int cb_each(struct cb_tree *, const uint8_t *kpfx, size_t klen,
-	    cb_iter, void *arg);
-
+int cb_each(struct cb_tree * , const uint8_t * kpfx, size_t klen, cb_iter, void * arg);
 #endif /* CBTREE_H */

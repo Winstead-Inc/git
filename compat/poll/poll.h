@@ -17,10 +17,8 @@
 
    You should have received a copy of the GNU General Public License along
    with this program; if not, see <http://www.gnu.org/licenses/>.  */
-
 #ifndef _GL_POLL_H
 #define _GL_POLL_H
-
 #if defined(_WIN32_WINNT) && _WIN32_WINNT >= 0x600
 /* Vista has its own, socket-only poll() */
 #undef POLLIN
@@ -50,18 +48,18 @@
 
 struct pollfd
 {
-  int fd;                       /* which file descriptor to poll */
-  short events;                 /* events we are interested in   */
-  short revents;                /* events found on return        */
+    int fd;
+/* which file descriptor to poll */ short events;
+/* events we are interested in   */ short revents;
+/* events found on return        */
 };
 
 typedef unsigned long nfds_t;
 
-extern int poll (struct pollfd *pfd, nfds_t nfd, int timeout);
+extern int poll(struct pollfd * pfd, nfds_t nfd, int timeout);
 
 /* Define INFTIM only if doing so conforms to POSIX.  */
 #if !defined (_POSIX_C_SOURCE) && !defined (_XOPEN_SOURCE)
 #define INFTIM (-1)
 #endif
-
 #endif /* _GL_POLL_H */

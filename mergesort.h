@@ -75,11 +75,9 @@ scope void name(type **listp,						\
 		list = next;						\
 	}								\
 }
-
 #define DECLARE_LIST_SORT(scope, name, type)			\
 scope void name(type **listp,					\
 		int (*compare_fn)(const type *, const type *))
-
 #define DEFINE_LIST_SORT_DEBUG(scope, name, type, next_member,	\
 			       on_get_next, on_set_next)	\
 								\
@@ -98,8 +96,6 @@ static inline void name##__set_next(type *elem, type *next)	\
 DEFINE_LIST_MERGE_INTERNAL(name, type)				\
 DEFINE_LIST_SORT_INTERNAL(scope, name, type)			\
 DECLARE_LIST_SORT(scope, name, type)
-
 #define DEFINE_LIST_SORT(scope, name, type, next_member) \
 DEFINE_LIST_SORT_DEBUG(scope, name, type, next_member, (void)0, (void)0)
-
 #endif

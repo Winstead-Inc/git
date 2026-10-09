@@ -6,9 +6,7 @@
  * The general idea is that some code asks to be notified when the working
  * directory changes, and other code that calls chdir uses a special wrapper
  * that notifies everyone.
- */
-
-/*
+ */ /*
  * Callers who need to know about changes can do:
  *
  *   void foo(const char *old_path, const char *new_path, void *data)
@@ -32,12 +30,13 @@
  * The "name" argument is used only for printing trace output from
  * $GIT_TRACE_SETUP. It may be NULL, but if non-NULL should point to
  * storage which lasts as long as the registration is active.
- */
-typedef void (*chdir_notify_callback)(const char *old_cwd,
-				      const char *new_cwd,
-				      void *data);
-void chdir_notify_register(chdir_notify_callback cb, void *data);
-void chdir_notify_unregister(chdir_notify_callback cb, void *data);
+ */ typedef void
+(
+    * chdir_notify_callback
+)
+(const char * old_cwd, const char * new_cwd, void * data);
+void chdir_notify_register(chdir_notify_callback cb, void * data);
+void chdir_notify_unregister(chdir_notify_callback cb, void * data);
 
 /*
  *
@@ -50,8 +49,10 @@ void chdir_notify_unregister(chdir_notify_callback cb, void *data);
  * Note that you don't need to chdir_notify() if you're just temporarily moving
  * to a directory and back, as long as you don't call any subscribed code in
  * between (but it should be safe to do so if you're unsure).
- */
-int chdir_notify(const char *new_cwd);
+ */ int chdir_notify
+(
+    const char * new_cwd
+);
 
 /*
  * Reparent a relative path from old_root to new_root. For example:
@@ -61,9 +62,8 @@ int chdir_notify(const char *new_cwd);
  * would return the (newly allocated) string "rel". Note that we may return an
  * absolute path in some cases (e.g., if the resulting path is not inside
  * new_cwd).
- */
-char *reparent_relative_path(const char *old_cwd,
-			     const char *new_cwd,
-			     const char *path);
-
+ */ char * reparent_relative_path
+(
+    const char * old_cwd, const char * new_cwd, const char * path
+);
 #endif /* CHDIR_NOTIFY_H */

@@ -16,9 +16,7 @@
    You should have received a copy of the GNU Lesser General Public
    License along with the GNU C Library; if not, see
    <http://www.gnu.org/licenses/>.  */
-
 #pragma GCC diagnostic ignored "-Wsign-compare"
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -27,7 +25,6 @@
 #ifdef __cplusplus
 # error "This is C code, use a C compiler"
 #endif
-
 #ifdef _LIBC
 /* We have to keep the namespace clean.  */
 # define regfree(preg) __regfree (preg)
@@ -49,10 +46,8 @@
 # define re_search_2(bufp, st1, s1, st2, s2, startpos, range, regs, stop) \
 	__re_search_2 (bufp, st1, s1, st2, s2, startpos, range, regs, stop)
 # define re_compile_fastmap(bufp) __re_compile_fastmap (bufp)
-
 # include "../locale/localeinfo.h"
 #endif
-
 #if defined (_MSC_VER)
 #include <stdio.h> /* for size_t */
 #endif
@@ -63,14 +58,12 @@
 #include <limits.h>
 #include <stdint.h>
 #include <stdlib.h>
-
 #ifdef GAWK
 #undef alloca
 #define alloca alloca_is_bad_you_should_never_use_it
 #endif
 #include <regex.h>
 #include "regex_internal.h"
-
 #include "regex_internal.c"
 #ifdef GAWK
 #define bool int
@@ -84,7 +77,6 @@
 #if _LIBC
 # include <shlib-compat.h>
 # if SHLIB_COMPAT (libc, GLIBC_2_0, GLIBC_2_3)
-link_warning (re_max_failures, "the 're_max_failures' variable is obsolete and will go away.")
-int re_max_failures = 2000;
+link_warning(re_max_failures, "the 're_max_failures' variable is obsolete and will go away.") int re_max_failures = 2000;
 # endif
 #endif

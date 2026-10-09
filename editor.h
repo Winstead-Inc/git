@@ -4,8 +4,8 @@
 struct repository;
 struct strbuf;
 
-const char *git_editor(void);
-const char *git_sequence_editor(void);
+const char * git_editor(void);
+const char * git_sequence_editor(void);
 int is_terminal_dumb(void);
 
 /**
@@ -14,12 +14,12 @@ int is_terminal_dumb(void);
  * third argument can be used to set the environment which the editor is
  * run in. If the buffer is NULL the editor is launched as usual but the
  * file's contents are not read into the buffer upon completion.
- */
-int launch_editor(const char *path, struct strbuf *buffer,
-		  const char *const *env);
+ */ int launch_editor
+(
+    const char * path, struct strbuf * buffer, const char * const * env
+);
 
-int launch_sequence_editor(const char *path, struct strbuf *buffer,
-			   const char *const *env);
+int launch_sequence_editor(const char * path, struct strbuf * buffer, const char * const * env);
 
 /*
  * In contrast to `launch_editor()`, this function writes out the contents
@@ -28,8 +28,8 @@ int launch_sequence_editor(const char *path, struct strbuf *buffer,
  * Finally, it deletes the temporary file.
  *
  * If `path` is relative, it refers to a file in the `.git` directory.
- */
-int strbuf_edit_interactively(struct repository *r, struct strbuf *buffer,
-			      const char *path, const char *const *env);
-
+ */ int strbuf_edit_interactively
+(
+    struct repository * r, struct strbuf * buffer, const char * path, const char * const * env
+);
 #endif

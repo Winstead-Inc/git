@@ -31,27 +31,29 @@ extern int quote_path_fully;
  *
  * sq_quotef() quotes the entire formatted string as a single result.
  */
-
-void sq_quote_buf(struct strbuf *, const char *src);
-void sq_quote_argv(struct strbuf *, const char **argv);
-__attribute__((format (printf, 2, 3)))
-void sq_quotef(struct strbuf *, const char *fmt, ...);
+void sq_quote_buf(struct strbuf * , const char * src);
+void sq_quote_argv(struct strbuf * , const char ** argv);
+__attribute__((format(printf, 2, 3))) void sq_quotef(struct strbuf * , const char * fmt, ...);
 
 /*
  * These match their non-pretty variants, except that they avoid
  * quoting when there are no exotic characters. These should only be used for
  * human-readable output, as sq_dequote() is not smart enough to dequote it.
- */
-void sq_quote_buf_pretty(struct strbuf *, const char *src);
-void sq_quote_argv_pretty(struct strbuf *, const char **argv);
-void sq_append_quote_argv_pretty(struct strbuf *dst, const char **argv);
+ */ void sq_quote_buf_pretty
+(
+    struct strbuf * , const char * src
+);
+void sq_quote_argv_pretty(struct strbuf * , const char ** argv);
+void sq_append_quote_argv_pretty(struct strbuf * dst, const char ** argv);
 
 /*
  * This unwraps what sq_quote() produces in place, but returns
  * NULL if the input does not look like what sq_quote would have
  * produced (the full string must be a single quoted item).
- */
-char *sq_dequote(char *);
+ */ char * sq_dequote
+(
+    char * 
+);
 
 /*
  * Like sq_dequote(), but dequote a single item, and leave "next" pointing to
@@ -63,37 +65,37 @@ char *sq_dequote(char *);
  * with "next" pointing to the space between "one" and "two"). The caller is
  * responsible for advancing the pointer to the start of the next item before
  * calling sq_dequote_step() again.
- */
-char *sq_dequote_step(char *src, char **next);
+ */ char * sq_dequote_step
+(
+    char * src, char ** next
+);
 
 /*
  * Same as the above, but can be used to unwrap many arguments in the
  * same string separated by space. The strvec will duplicate and take
  * ownership of the strings, but note that "arg" is still modified in-place
  * during parsing.
- */
-int sq_dequote_to_strvec(char *arg, struct strvec *);
+ */ int sq_dequote_to_strvec
+(
+    char * arg, struct strvec * 
+);
 
-int unquote_c_style(struct strbuf *, const char *quoted, const char **endp);
+int unquote_c_style(struct strbuf * , const char * quoted, const char ** endp);
 
 /* Bits in the flags parameter to quote_c_style() */
 #define CQUOTE_NODQ 01
-size_t quote_c_style(const char *name, struct strbuf *, FILE *, unsigned);
-void quote_two_c_style(struct strbuf *, const char *, const char *, unsigned);
+size_t quote_c_style(const char * name, struct strbuf * , FILE * , unsigned);
+void quote_two_c_style(struct strbuf * , const char * , const char * , unsigned);
 
-void write_name_quoted(const char *name, FILE *, int terminator);
-void write_name_quoted_relative(const char *name, const char *prefix,
-				FILE *fp, int terminator);
+void write_name_quoted(const char * name, FILE * , int terminator);
+void write_name_quoted_relative(const char * name, const char * prefix, FILE * fp, int terminator);
 
-/* quote path as relative to the given prefix */
-char *quote_path(const char *in, const char *prefix, struct strbuf *out, unsigned flags);
+/* quote path as relative to the given prefix */ char * quote_path(const char * in, const char * prefix, struct strbuf * out, unsigned flags);
 #define QUOTE_PATH_QUOTE_SP 01
 
-/* quoting as a string literal for other languages */
-void perl_quote_buf(struct strbuf *sb, const char *src);
-void perl_quote_buf_with_len(struct strbuf *sb, const char *src, size_t len);
-void python_quote_buf(struct strbuf *sb, const char *src);
-void tcl_quote_buf(struct strbuf *sb, const char *src);
-void basic_regex_quote_buf(struct strbuf *sb, const char *src);
-
+/* quoting as a string literal for other languages */ void perl_quote_buf(struct strbuf * sb, const char * src);
+void perl_quote_buf_with_len(struct strbuf * sb, const char * src, size_t len);
+void python_quote_buf(struct strbuf * sb, const char * src);
+void tcl_quote_buf(struct strbuf * sb, const char * src);
+void basic_regex_quote_buf(struct strbuf * sb, const char * src);
 #endif

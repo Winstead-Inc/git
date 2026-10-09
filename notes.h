@@ -1,6 +1,5 @@
 #ifndef NOTES_H
 #define NOTES_H
-
 #include "string-list.h"
 
 struct object_id;
@@ -26,19 +25,16 @@ struct strbuf;
  * The default combine_notes function (you get this when passing NULL) is
  * combine_notes_concatenate(), which appends the contents of the new note to
  * the contents of the existing note.
- */
-typedef int (*combine_notes_fn)(struct object_id *cur_oid,
-				const struct object_id *new_oid);
+ */ typedef int
+(
+    * combine_notes_fn
+)
+(struct object_id * cur_oid, const struct object_id * new_oid);
 
-/* Common notes combinators */
-int combine_notes_concatenate(struct object_id *cur_oid,
-			      const struct object_id *new_oid);
-int combine_notes_overwrite(struct object_id *cur_oid,
-			    const struct object_id *new_oid);
-int combine_notes_ignore(struct object_id *cur_oid,
-			 const struct object_id *new_oid);
-int combine_notes_cat_sort_uniq(struct object_id *cur_oid,
-				const struct object_id *new_oid);
+/* Common notes combinators */ int combine_notes_concatenate(struct object_id * cur_oid, const struct object_id * new_oid);
+int combine_notes_overwrite(struct object_id * cur_oid, const struct object_id * new_oid);
+int combine_notes_ignore(struct object_id * cur_oid, const struct object_id * new_oid);
+int combine_notes_cat_sort_uniq(struct object_id * cur_oid, const struct object_id * new_oid);
 
 /*
  * Notes tree object
@@ -48,16 +44,17 @@ int combine_notes_cat_sort_uniq(struct object_id *cur_oid,
  * order to use the default/internal notes tree. E.g. you only need to pass a
  * non-NULL value if you need to refer to several different notes trees
  * simultaneously.
- */
-extern struct notes_tree {
-	struct int_node *root;
-	struct non_note *first_non_note, *prev_non_note;
-	char *ref;
-	char *update_ref;
-	combine_notes_fn combine_notes;
-	int initialized;
-	int dirty;
-} default_notes_tree;
+ */ extern struct notes_tree
+{
+    struct int_node * root;
+    struct non_note * first_non_note, * prev_non_note;
+    char * ref;
+    char * update_ref;
+    combine_notes_fn combine_notes;
+    int initialized;
+    int dirty;
+}
+default_notes_tree;
 
 /*
  * Return the default notes ref.
@@ -70,8 +67,10 @@ extern struct notes_tree {
  * 2. The $GIT_NOTES_REF environment variable, if set
  * 3. The value of the core.notesRef config variable, if set
  * 4. GIT_NOTES_DEFAULT_REF (i.e. "refs/notes/commits")
- */
-char *default_notes_ref(struct repository *repo);
+ */ char * default_notes_ref
+(
+    struct repository * repo
+);
 
 /*
  * Flags controlling behaviour of notes tree initialization
@@ -106,9 +105,10 @@ char *default_notes_ref(struct repository *repo);
  *
  * Precondition: The notes_tree structure is zeroed (this can be achieved with
  * memset(t, 0, sizeof(struct notes_tree)))
- */
-void init_notes(struct notes_tree *t, const char *notes_ref,
-		combine_notes_fn combine_notes, int flags);
+ */ void init_notes
+(
+    struct notes_tree * t, const char * notes_ref, combine_notes_fn combine_notes, int flags
+);
 
 /*
  * Add the given note object to the given notes_tree structure
@@ -129,9 +129,10 @@ void init_notes(struct notes_tree *t, const char *notes_ref,
  * IMPORTANT: The changes made by add_note() to the given notes_tree structure
  * are not persistent until a subsequent call to write_notes_tree() returns
  * zero.
- */
-int add_note(struct notes_tree *t, const struct object_id *object_oid,
-		const struct object_id *note_oid, combine_notes_fn combine_notes);
+ */ int add_note
+(
+    struct notes_tree * t, const struct object_id * object_oid, const struct object_id * note_oid, combine_notes_fn combine_notes
+);
 
 /*
  * Remove the given note object from the given notes_tree structure
@@ -141,16 +142,19 @@ int add_note(struct notes_tree *t, const struct object_id *object_oid,
  * returns zero.
  *
  * Return 0 if a note was removed; 1 if there was no note to remove.
- */
-int remove_note(struct notes_tree *t, const unsigned char *object_sha1);
+ */ int remove_note
+(
+    struct notes_tree * t, const unsigned char * object_sha1
+);
 
 /*
  * Get the note object SHA1 containing the note data for the given object
  *
  * Return NULL if the given object has no notes.
- */
-const struct object_id *get_note(struct notes_tree *t,
-		const struct object_id *object_oid);
+ */ const struct object_id * get_note
+(
+    struct notes_tree * t, const struct object_id * object_oid
+);
 
 /*
  * Copy a note from one object to another in the given notes_tree.
@@ -163,10 +167,10 @@ const struct object_id *get_note(struct notes_tree *t,
  * IMPORTANT: The changes made by copy_note() to the given notes_tree structure
  * are not persistent until a subsequent call to write_notes_tree() returns
  * zero.
- */
-int copy_note(struct notes_tree *t,
-	      const struct object_id *from_obj, const struct object_id *to_obj,
-	      int force, combine_notes_fn combine_notes);
+ */ int copy_note
+(
+    struct notes_tree * t, const struct object_id * from_obj, const struct object_id * to_obj, int force, combine_notes_fn combine_notes
+);
 
 /*
  * Flags controlling behaviour of for_each_note()
@@ -210,12 +214,11 @@ int copy_note(struct notes_tree *t,
  * - remove_note()
  * - copy_note()
  * - free_notes()
- */
-typedef int each_note_fn(const struct object_id *object_oid,
-		const struct object_id *note_oid, char *note_path,
-		void *cb_data);
-int for_each_note(struct notes_tree *t, int flags, each_note_fn fn,
-		void *cb_data);
+ */ typedef int each_note_fn
+(
+    const struct object_id * object_oid, const struct object_id * note_oid, char * note_path, void * cb_data
+);
+int for_each_note(struct notes_tree * t, int flags, each_note_fn fn, void * cb_data);
 
 /*
  * Write the given notes_tree structure to the object database
@@ -228,8 +231,10 @@ int for_each_note(struct notes_tree *t, int flags, each_note_fn fn,
  * IMPORTANT: Changes made to the given notes_tree are not persistent until
  * this function has returned zero. Please also remember to create a
  * corresponding commit object, and update the appropriate notes ref.
- */
-int write_notes_tree(struct notes_tree *t, struct object_id *result);
+ */ int write_notes_tree
+(
+    struct notes_tree * t, struct object_id * result
+);
 
 /* Flags controlling the operation of prune */
 #define NOTES_PRUNE_VERBOSE 1
@@ -243,43 +248,44 @@ int write_notes_tree(struct notes_tree *t, struct object_id *result);
  * IMPORTANT: The changes made by prune_notes() to the given notes_tree
  * structure are not persistent until a subsequent call to write_notes_tree()
  * returns zero.
- */
-void prune_notes(struct notes_tree *t, int flags);
+ */ void prune_notes
+(
+    struct notes_tree * t, int flags
+);
 
 /*
  * Free (and de-initialize) the given notes_tree structure
  *
  * IMPORTANT: Changes made to the given notes_tree since the last, successful
  * call to write_notes_tree() will be lost.
- */
-void free_notes(struct notes_tree *t);
+ */ void free_notes
+(
+    struct notes_tree * t
+);
 
 struct string_list;
 
-struct display_notes_opt {
-	/*
+struct display_notes_opt
+{
+    /*
 	 * Less than `0` is "unset", which means that the default notes
 	 * are shown iff no other notes are given. Otherwise,
 	 * treat it like a boolean.
-	 */
-	int use_default_notes;
+	 */ int use_default_notes;
 
-	/*
+    /*
 	 * A list of globs (in the same style as notes.displayRef) where
 	 * notes should be loaded from.
-	 */
-	struct string_list extra_notes_refs;
+	 */ struct string_list extra_notes_refs;
 };
 
 /*
  * Initialize a display_notes_opt to its default value.
- */
-void init_display_notes(struct display_notes_opt *opt);
+ */ void init_display_notes(struct display_notes_opt * opt);
 
 /*
  * Release resources acquired by the display_notes_opt.
- */
-void release_display_notes(struct display_notes_opt *opt);
+ */ void release_display_notes(struct display_notes_opt * opt);
 
 /*
  * This family of functions enables or disables the display of notes. In
@@ -290,18 +296,18 @@ void release_display_notes(struct display_notes_opt *opt);
  *
  * 'show_notes' is a pointer to a boolean which will be set to 1 if notes are
  * displayed, else 0. It must not be NULL.
- */
-void enable_default_display_notes(struct display_notes_opt *opt, int *show_notes);
-void enable_ref_display_notes(struct display_notes_opt *opt, int *show_notes,
-		const char *ref);
-void disable_display_notes(struct display_notes_opt *opt, int *show_notes);
+ */ void enable_default_display_notes
+(
+    struct display_notes_opt * opt, int * show_notes
+);
+void enable_ref_display_notes(struct display_notes_opt * opt, int * show_notes, const char * ref);
+void disable_display_notes(struct display_notes_opt * opt, int * show_notes);
 
 /*
  * Load the notes machinery for displaying several notes trees.
  *
  * 'opt' may be NULL.
- */
-void load_display_notes(struct display_notes_opt *opt);
+ */ void load_display_notes(struct display_notes_opt * opt);
 
 /*
  * Append notes for the given 'object_sha1' from all trees set up by
@@ -311,37 +317,40 @@ void load_display_notes(struct display_notes_opt *opt);
  * a 'Notes (refname):' header added.
  *
  * You *must* call load_display_notes() before using this function.
- */
-void format_display_notes(const struct object_id *object_oid,
-			  struct strbuf *sb, const char *output_encoding, int raw);
+ */ void format_display_notes
+(
+    const struct object_id * object_oid, struct strbuf * sb, const char * output_encoding, int raw
+);
 
 /*
  * Load the notes tree from each ref listed in 'refs'.  The output is
  * an array of notes_tree*, terminated by a NULL.
- */
-struct notes_tree **load_notes_trees(struct string_list *refs, int flags);
+ */ struct notes_tree ** load_notes_trees
+(
+    struct string_list * refs, int flags
+);
 
 /*
  * Add all refs that match 'glob' to the 'list'.
- */
-void string_list_add_refs_by_glob(struct string_list *list, const char *glob);
+ */ void string_list_add_refs_by_glob(struct string_list * list, const char * glob);
 
 /*
  * Add all refs from a colon-separated glob list 'globs' to the end of
  * 'list'.  Empty components are ignored.  This helper is used to
  * parse GIT_NOTES_DISPLAY_REF style environment variables.
- */
-void string_list_add_refs_from_colon_sep(struct string_list *list,
-					 const char *globs);
+ */ void string_list_add_refs_from_colon_sep
+(
+    struct string_list * list, const char * globs
+);
 
-/* Expand inplace a note ref like "foo" or "notes/foo" into "refs/notes/foo" */
-void expand_notes_ref(struct strbuf *sb);
+/* Expand inplace a note ref like "foo" or "notes/foo" into "refs/notes/foo" */ void expand_notes_ref(struct strbuf * sb);
 
 /*
  * Similar to expand_notes_ref, but will check whether the ref can be located
  * via get_sha1 first, and only falls back to expand_notes_ref in the case
  * where get_sha1 fails.
- */
-void expand_loose_notes_ref(struct strbuf *sb);
-
+ */ void expand_loose_notes_ref
+(
+    struct strbuf * sb
+);
 #endif

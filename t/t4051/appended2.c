@@ -1,6 +1,6 @@
-	printf("Begin of second part\n");
+printf("Begin of second part\n");
 
-	/*
+/*
 	 * Lorem ipsum dolor sit amet, consectetuer sadipscing elitr,
 	 * sed diam nonumy eirmod tempor invidunt ut labore et dolore
 	 * magna aliquyam erat, sed diam voluptua. At vero eos et
@@ -30,6 +30,5 @@
 	 * sit amet.
 	 *
 	 */
-
-	return 0;
-}	// End of second part
+return 0;
+} // End of second part

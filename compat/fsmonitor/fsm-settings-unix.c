@@ -5,7 +5,7 @@
 #include "fsmonitor-settings.h"
 #include "fsmonitor-path-utils.h"
 
- /*
+/*
  * For the builtin FSMonitor, we create the Unix domain socket for the
  * IPC in the .git directory.  If the working directory is remote,
  * then the socket will be created on the remote file system.  This
@@ -23,41 +23,31 @@
  * directory for IPC.  These Windows drive formats do not support
  * Unix domain sockets, so mark them as incompatible for the daemon.
  *
- */
-static enum fsmonitor_reason check_uds_volume(struct repository *r)
+ */ static enum fsmonitor_reason check_uds_volume
+(
+    struct repository * r
+)
 {
-	struct fs_info fs;
-	const char *ipc_path = fsmonitor_ipc__get_path(r);
-	struct strbuf path = STRBUF_INIT;
-	strbuf_add(&path, ipc_path, strlen(ipc_path));
+    struct fs_info fs;
+    const char * ipc_path = fsmonitor_ipc__get_path(r);
+    struct strbuf path = STRBUF_INIT;
+    strbuf_add( & path, ipc_path, strlen(ipc_path));
 
-	if (fsmonitor__get_fs_info(dirname(path.buf), &fs) == -1) {
-		strbuf_release(&path);
-		return FSMONITOR_REASON_ERROR;
-	}
+    if (fsmonitor__get_fs_info(dirname(path.buf), & fs) == - 1) { strbuf_release( & path); return FSMONITOR_REASON_ERROR; }
 
-	strbuf_release(&path);
+    strbuf_release( & path);
 
-	if (fs.is_remote ||
-		!strcmp(fs.typename, "msdos") ||
-		!strcmp(fs.typename, "ntfs")) {
-		free(fs.typename);
-		return FSMONITOR_REASON_NOSOCKETS;
-	}
+    if (fs.is_remote || ! strcmp(fs.typename , "msdos") || ! strcmp(fs.typename , "ntfs")) { free(fs.typename); return FSMONITOR_REASON_NOSOCKETS; }
 
-	free(fs.typename);
-	return FSMONITOR_REASON_OK;
+    free(fs.typename);
+    return FSMONITOR_REASON_OK;
 }
 
-enum fsmonitor_reason fsm_os__incompatible(struct repository *r, int ipc)
+enum fsmonitor_reason fsm_os__incompatible(struct repository * r, int ipc)
 {
-	enum fsmonitor_reason reason;
+    enum fsmonitor_reason reason;
 
-	if (ipc) {
-		reason = check_uds_volume(r);
-		if (reason != FSMONITOR_REASON_OK)
-			return reason;
-	}
+    if (ipc) { reason = check_uds_volume(r); if (reason != FSMONITOR_REASON_OK) return reason; }
 
-	return FSMONITOR_REASON_OK;
+    return FSMONITOR_REASON_OK;
 }

@@ -10,7 +10,8 @@
 // You should have received a copy of the GNU General Public License along
 // with this program; if not, see <https://www.gnu.org/licenses/>.
 
-fn main() {
+fn main()
+{
     println!("cargo:rustc-link-search=.");
     println!("cargo:rustc-link-lib=git");
     println!("cargo:rustc-link-lib=z");

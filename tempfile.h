@@ -1,6 +1,5 @@
 #ifndef TEMPFILE_H
 #define TEMPFILE_H
-
 #include "list.h"
 #include "strbuf.h"
 
@@ -76,14 +75,14 @@ struct repository;
  * `delete_tempfile()` and `rename` (but not `close`) do their best to
  * delete the temporary file before returning.
  */
-
-struct tempfile {
-	volatile struct volatile_list_head list;
-	volatile int fd;
-	FILE *volatile fp;
-	volatile pid_t owner;
-	struct strbuf filename;
-	char *directory;
+struct tempfile
+{
+    volatile struct volatile_list_head list;
+    volatile int fd;
+    FILE * volatile fp;
+    volatile pid_t owner;
+    struct strbuf filename;
+    char * directory;
 };
 
 /*
@@ -93,24 +92,22 @@ struct tempfile {
  * Note that `mode` will be further modified by the umask, and possibly
  * `core.sharedRepository`, so it is not guaranteed to have the given
  * mode.
- */
-struct tempfile *repo_create_tempfile_mode(struct repository *r,
-					   const char *path, int mode);
+ */ struct tempfile * repo_create_tempfile_mode
+(
+    struct repository * r, const char * path, int mode
+);
 
-static inline struct tempfile *repo_create_tempfile(struct repository *r,
-						    const char *path)
-{
-	return repo_create_tempfile_mode(r, path, 0666);
-}
+static inline struct tempfile * repo_create_tempfile(struct repository * r, const char * path) { return repo_create_tempfile_mode(r, path, 0666); }
 
 /*
  * Register an existing file as a tempfile, meaning that it will be
  * deleted when the program exits. The tempfile is considered closed,
  * but it can be worked with like any other closed tempfile (for
  * example, it can be opened using reopen_tempfile()).
- */
-struct tempfile *register_tempfile(const char *path);
-
+ */ struct tempfile * register_tempfile
+(
+    const char * path
+);
 
 /*
  * mks_tempfile functions
@@ -145,61 +142,48 @@ struct tempfile *register_tempfile(const char *path);
  * for writing the temporary file. On errors, they return NULL and set
  * errno appropriately (except for the "x" variants, which die() on
  * errors).
- */
+ */ /* See "mks_tempfile functions" above. */ struct tempfile * mks_tempfile_sm
+(
+    const char * filename_template, int suffixlen, int mode
+);
 
-/* See "mks_tempfile functions" above. */
-struct tempfile *mks_tempfile_sm(const char *filename_template,
-				 int suffixlen, int mode);
-
-/* See "mks_tempfile functions" above. */
-static inline struct tempfile *mks_tempfile_s(const char *filename_template,
-					      int suffixlen)
+/* See "mks_tempfile functions" above. */ static inline struct tempfile * mks_tempfile_s(const char * filename_template, int suffixlen)
 {
-	return mks_tempfile_sm(filename_template, suffixlen, 0600);
+    return mks_tempfile_sm(filename_template, suffixlen, 0600);
 }
 
-/* See "mks_tempfile functions" above. */
-static inline struct tempfile *mks_tempfile_m(const char *filename_template, int mode)
+/* See "mks_tempfile functions" above. */ static inline struct tempfile * mks_tempfile_m(const char * filename_template, int mode)
 {
-	return mks_tempfile_sm(filename_template, 0, mode);
+    return mks_tempfile_sm(filename_template, 0, mode);
 }
 
-/* See "mks_tempfile functions" above. */
-static inline struct tempfile *mks_tempfile(const char *filename_template)
+/* See "mks_tempfile functions" above. */ static inline struct tempfile * mks_tempfile(const char * filename_template)
 {
-	return mks_tempfile_sm(filename_template, 0, 0600);
+    return mks_tempfile_sm(filename_template, 0, 0600);
 }
 
-/* See "mks_tempfile functions" above. */
-struct tempfile *mks_tempfile_tsm(const char *filename_template,
-				  int suffixlen, int mode);
+/* See "mks_tempfile functions" above. */ struct tempfile * mks_tempfile_tsm(const char * filename_template, int suffixlen, int mode);
 
-/* See "mks_tempfile functions" above. */
-static inline struct tempfile *mks_tempfile_ts(const char *filename_template,
-					       int suffixlen)
+/* See "mks_tempfile functions" above. */ static inline struct tempfile * mks_tempfile_ts(const char * filename_template, int suffixlen)
 {
-	return mks_tempfile_tsm(filename_template, suffixlen, 0600);
+    return mks_tempfile_tsm(filename_template, suffixlen, 0600);
 }
 
-/* See "mks_tempfile functions" above. */
-static inline struct tempfile *mks_tempfile_tm(const char *filename_template, int mode)
+/* See "mks_tempfile functions" above. */ static inline struct tempfile * mks_tempfile_tm(const char * filename_template, int mode)
 {
-	return mks_tempfile_tsm(filename_template, 0, mode);
+    return mks_tempfile_tsm(filename_template, 0, mode);
 }
 
-/* See "mks_tempfile functions" above. */
-static inline struct tempfile *mks_tempfile_t(const char *filename_template)
+/* See "mks_tempfile functions" above. */ static inline struct tempfile * mks_tempfile_t(const char * filename_template)
 {
-	return mks_tempfile_tsm(filename_template, 0, 0600);
+    return mks_tempfile_tsm(filename_template, 0, 0600);
 }
 
-/* See "mks_tempfile functions" above. */
-struct tempfile *xmks_tempfile_m(const char *filename_template, int mode);
+/* See "mks_tempfile functions" above. */ struct tempfile * xmks_tempfile_m(const char * filename_template, int mode);
 
-/* See "mks_tempfile functions" above. */
-static inline struct tempfile *xmks_tempfile(const char *filename_template)
+/* See "mks_tempfile functions" above. */ static inline struct tempfile * xmks_tempfile(const char * filename_template)
 {
-	return xmks_tempfile_m(filename_template, 0600);
+    return xmks_tempfile_m(filename_template, 0600);
 }
 
 /*
@@ -210,31 +194,33 @@ static inline struct tempfile *xmks_tempfile(const char *filename_template)
  * explicitly. On success return a tempfile whose "filename" member
  * contains the full path of the file and its "fd" member is open for
  * writing the file. On error return NULL and set errno appropriately.
- */
-struct tempfile *mks_tempfile_dt(const char *directory_template,
-				 const char *filename);
+ */ struct tempfile * mks_tempfile_dt
+(
+    const char * directory_template, const char * filename
+);
 
 /*
  * Associate a stdio stream with the temporary file (which must still
  * be open). Return `NULL` (*without* deleting the file) on error. The
  * stream is closed automatically when `close_tempfile_gently()` is called or
  * when the file is deleted or renamed.
- */
-FILE *fdopen_tempfile(struct tempfile *tempfile, const char *mode);
+ */ FILE * fdopen_tempfile
+(
+    struct tempfile * tempfile, const char * mode
+);
 
-static inline int is_tempfile_active(struct tempfile *tempfile)
-{
-	return !!tempfile;
-}
+static inline int is_tempfile_active(struct tempfile * tempfile) { return !! tempfile; }
 
 /*
  * Return the path of the lockfile. The return value is a pointer to a
  * field within the lock_file object and should not be freed.
- */
-const char *get_tempfile_path(struct tempfile *tempfile);
+ */ const char * get_tempfile_path
+(
+    struct tempfile * tempfile
+);
 
-int get_tempfile_fd(struct tempfile *tempfile);
-FILE *get_tempfile_fp(struct tempfile *tempfile);
+int get_tempfile_fd(struct tempfile * tempfile);
+FILE * get_tempfile_fp(struct tempfile * tempfile);
 
 /*
  * If the temporary file is still open, close it (and the file pointer
@@ -243,8 +229,10 @@ FILE *get_tempfile_fp(struct tempfile *tempfile);
  * return a negative value. Usually `delete_tempfile()` or `rename_tempfile()`
  * should eventually be called regardless of whether `close_tempfile_gently()`
  * succeeds.
- */
-int close_tempfile_gently(struct tempfile *tempfile);
+ */ int close_tempfile_gently
+(
+    struct tempfile * tempfile
+);
 
 /*
  * Re-open a temporary file that has been closed using
@@ -264,16 +252,20 @@ int close_tempfile_gently(struct tempfile *tempfile);
  *   contents. Write out the new contents.
  *
  * * `rename_tempfile()` to move the file to its permanent location.
- */
-int reopen_tempfile(struct tempfile *tempfile);
+ */ int reopen_tempfile
+(
+    struct tempfile * tempfile
+);
 
 /*
  * Close the file descriptor and/or file pointer and remove the
  * temporary file associated with `tempfile`. It is a NOOP to call
  * `delete_tempfile()` for a `tempfile` object that has already been
  * deleted or renamed.
- */
-int delete_tempfile(struct tempfile **tempfile_p);
+ */ int delete_tempfile
+(
+    struct tempfile ** tempfile_p
+);
 
 /*
  * Close the file descriptor and/or file pointer if they are still
@@ -283,8 +275,10 @@ int delete_tempfile(struct tempfile **tempfile_p);
  * `errno` set to the value from the failing call to `close(2)` or
  * `rename(2)`. It is a bug to call `rename_tempfile()` for a
  * `tempfile` object that is not currently active.
- */
-int rename_tempfile(struct tempfile **tempfile_p, const char *path);
+ */ int rename_tempfile
+(
+    struct tempfile ** tempfile_p, const char * path
+);
 
 /*
  * Reassign ownership of all active tempfiles whose `owner` field matches
@@ -294,7 +288,8 @@ int rename_tempfile(struct tempfile **tempfile_p, const char *path);
  * transfers ownership to the daemonized child so that its atexit handler does
  * not unlink tempfiles that should outlive it, and the child claims the
  * inherited tempfiles so that they are cleaned up when the daemon exits.
- */
-void reassign_tempfile_ownership(pid_t from, pid_t to);
-
+ */ void reassign_tempfile_ownership
+(
+    pid_t from, pid_t to
+);
 #endif /* TEMPFILE_H */

@@ -22,12 +22,9 @@
    CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
    SOFTWARE.
 */
-
 #ifndef __AC_KHASH_H
 #define __AC_KHASH_H
-
 #include "hash.h"
-
 #define AC_VERSION_KHASH_H "0.2.8"
 
 typedef uint32_t khint32_t;
@@ -35,7 +32,6 @@ typedef uint64_t khint64_t;
 
 typedef khint32_t khint_t;
 typedef khint_t khiter_t;
-
 #define __ac_isempty(flag, i) ((flag[i>>4]>>((i&0xfU)<<1))&2)
 #define __ac_isdel(flag, i) ((flag[i>>4]>>((i&0xfU)<<1))&1)
 #define __ac_iseither(flag, i) ((flag[i>>4]>>((i&0xfU)<<1))&3)
@@ -43,23 +39,19 @@ typedef khint_t khiter_t;
 #define __ac_set_isempty_false(flag, i) (flag[i>>4]&=~(2ul<<((i&0xfU)<<1)))
 #define __ac_set_isboth_false(flag, i) (flag[i>>4]&=~(3ul<<((i&0xfU)<<1)))
 #define __ac_set_isdel_true(flag, i) (flag[i>>4]|=1ul<<((i&0xfU)<<1))
-
 #define __ac_fsize(m) ((m) < 16? 1 : (m)>>4)
-
 #define kroundup32(x) (--(x), (x)|=(x)>>1, (x)|=(x)>>2, (x)|=(x)>>4, (x)|=(x)>>8, (x)|=(x)>>16, ++(x))
 
-static inline khint_t __ac_X31_hash_string(const char *s)
+static inline khint_t __ac_X31_hash_string(const char * s)
 {
-	khint_t h = (khint_t)*s;
-	if (h) for (++s ; *s; ++s) h = (h << 5) - h + (khint_t)*s;
-	return h;
+    khint_t h = (khint_t) * s;
+    if (h) for ( ++ s; * s; ++ s) h = (h << 5) - h + (khint_t) * s;
+    return h;
 }
-
 #define kh_str_hash_func(key) __ac_X31_hash_string(key)
 #define kh_str_hash_equal(a, b) (strcmp(a, b) == 0)
 
 static const double __ac_HASH_UPPER = 0.77;
-
 #define __KHASH_TYPE(name, khkey_t, khval_t) \
 	typedef struct kh_##name { \
 		khint_t n_buckets, size, n_occupied, upper_bound; \
@@ -67,7 +59,6 @@ static const double __ac_HASH_UPPER = 0.77;
 		khkey_t *keys; \
 		khval_t *vals; \
 	} kh_##name##_t;
-
 #define __KHASH_PROTOTYPES(name, khkey_t, khval_t)	 			\
 	kh_##name##_t *kh_init_##name(void);						\
 	void kh_destroy_##name(kh_##name##_t *h);					\
@@ -76,7 +67,6 @@ static const double __ac_HASH_UPPER = 0.77;
 	void kh_resize_##name(kh_##name##_t *h, khint_t new_n_buckets); \
 	khint_t kh_put_##name(kh_##name##_t *h, khkey_t key, int *ret); \
 	void kh_del_##name(kh_##name##_t *h, khint_t x);
-
 #define __KHASH_IMPL(name, SCOPE, khkey_t, khval_t, kh_is_map, __hash_func, __hash_equal) \
 	SCOPE kh_##name##_t *kh_init_##name(void) {							\
 		return (kh_##name##_t*)xcalloc(1, sizeof(kh_##name##_t));		\
@@ -219,21 +209,16 @@ static const double __ac_HASH_UPPER = 0.77;
 			--h->size;													\
 		}																\
 	}
-
 #define KHASH_DECLARE(name, khkey_t, khval_t)		 					\
 	__KHASH_TYPE(name, khkey_t, khval_t) 								\
 	__KHASH_PROTOTYPES(name, khkey_t, khval_t)
-
 #define KHASH_INIT2(name, SCOPE, khkey_t, khval_t, kh_is_map, __hash_func, __hash_equal) \
 	__KHASH_TYPE(name, khkey_t, khval_t) 								\
 	__KHASH_IMPL(name, SCOPE, khkey_t, khval_t, kh_is_map, __hash_func, __hash_equal)
-
 #define KHASH_INIT(name, khkey_t, khval_t, kh_is_map, __hash_func, __hash_equal) \
 	KHASH_INIT2(name, MAYBE_UNUSED static inline, khkey_t, khval_t, kh_is_map, __hash_func, __hash_equal)
 
-/* Other convenient macros... */
-
-/*! @function
+/* Other convenient macros... */ /*! @function
   @abstract     Test whether a bucket contains data.
   @param  h     Pointer to the hash table [khash_t(name)*]
   @param  x     Iterator to the bucket [khint_t]
@@ -319,20 +304,11 @@ static const double __ac_HASH_UPPER = 0.77;
 		code;												\
 	} }
 
-static inline unsigned int oidhash_by_value(struct object_id oid)
-{
-	return oidhash(&oid);
-}
+static inline unsigned int oidhash_by_value(struct object_id oid) { return oidhash( & oid); }
 
-static inline int oideq_by_value(struct object_id a, struct object_id b)
-{
-	return oideq(&a, &b);
-}
+static inline int oideq_by_value(struct object_id a, struct object_id b) { return oideq( & a, & b); }
 
-KHASH_INIT(oid_set, struct object_id, int, 0, oidhash_by_value, oideq_by_value)
-
-KHASH_INIT(oid_map, struct object_id, void *, 1, oidhash_by_value, oideq_by_value)
-
-KHASH_INIT(oid_pos, struct object_id, int, 1, oidhash_by_value, oideq_by_value)
-
+KHASH_INIT(oid_set, struct object_id, int , 0, oidhash_by_value, oideq_by_value)
+KHASH_INIT(oid_map, struct object_id, void * , 1, oidhash_by_value, oideq_by_value)
+KHASH_INIT(oid_pos, struct object_id, int , 1, oidhash_by_value, oideq_by_value)
 #endif /* __AC_KHASH_H */

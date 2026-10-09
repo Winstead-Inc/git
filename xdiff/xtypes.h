@@ -19,44 +19,36 @@
  *  Davide Libenzi <davidel@xmailserver.org>
  *
  */
-
 #if !defined(XTYPES_H)
 #define XTYPES_H
 
+typedef struct s_chanode { struct s_chanode * next; long icurr; }
+chanode_t;
 
+typedef struct s_chastore
+{
+    chanode_t * head, * tail;
+    long isize, nsize;
+    chanode_t * ancur;
+    chanode_t * sncur;
+    long scurr;
+}
+chastore_t;
 
-typedef struct s_chanode {
-	struct s_chanode *next;
-	long icurr;
-} chanode_t;
+typedef struct s_xrecord { uint8_t const * ptr; size_t size; size_t minimal_perfect_hash; }
+xrecord_t;
 
-typedef struct s_chastore {
-	chanode_t *head, *tail;
-	long isize, nsize;
-	chanode_t *ancur;
-	chanode_t *sncur;
-	long scurr;
-} chastore_t;
+typedef struct s_xdfile
+{
+    xrecord_t * recs;
+    size_t nrec;
+    ptrdiff_t dstart, dend;
+    bool * changed;
+    size_t * reference_index;
+    size_t nreff;
+}
+xdfile_t;
 
-typedef struct s_xrecord {
-	uint8_t const *ptr;
-	size_t size;
-	size_t minimal_perfect_hash;
-} xrecord_t;
-
-typedef struct s_xdfile {
-	xrecord_t *recs;
-	size_t nrec;
-	ptrdiff_t dstart, dend;
-	bool *changed;
-	size_t *reference_index;
-	size_t nreff;
-} xdfile_t;
-
-typedef struct s_xdfenv {
-	xdfile_t xdf1, xdf2;
-} xdfenv_t;
-
-
-
+typedef struct s_xdfenv { xdfile_t xdf1, xdf2; }
+xdfenv_t;
 #endif /* #if !defined(XTYPES_H) */

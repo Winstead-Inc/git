@@ -105,15 +105,13 @@
  * returned `attr_check.items[]` objects.)
  *
  * - Free the `attr_check` struct by calling `attr_check_free()`.
- */
-
-/**
+ */ /**
  * The maximum line length for a gitattributes file. If the line exceeds this
  * length we will ignore it.
  */
 #define ATTR_MAX_LINE_LENGTH 2048
 
- /**
+/**
   * The maximum size of the giattributes file. If the file exceeds this size we
   * will ignore it.
   */
@@ -127,27 +125,25 @@ struct index_state;
  * The internal representation of this structure is of no interest to the
  * calling programs. The name of the attribute can be retrieved by calling
  * `git_attr_name()`.
- */
-struct git_attr;
+ */ struct git_attr;
 
-/* opaque structures used internally for attribute collection */
-struct all_attrs_item;
+/* opaque structures used internally for attribute collection */ struct all_attrs_item;
 struct attr_stack;
 
 /*
  * The textual object name for the tree-ish used by git_check_attr()
  * to read attributes from (instead of from the working tree).
- */
-void set_git_attr_source(const char *);
+ */ void set_git_attr_source
+(
+    const char * 
+);
 
 /*
  * Given a string, return the gitattribute object that
  * corresponds to it.
- */
-const struct git_attr *git_attr(const char *);
+ */ const struct git_attr * git_attr(const char *);
 
-/* Internal use */
-extern const char git_attr__true[];
+/* Internal use */ extern const char git_attr__true[];
 extern const char git_attr__false[];
 
 /**
@@ -158,9 +154,7 @@ extern const char git_attr__false[];
  * or set to a string, and `.value` member of `struct attr_check_item` records
  * it. The three macros check these, if none of them returns true, `.value`
  * member points at a string value of the attribute for the path.
- */
-
-/* Returns true if the attribute is Set for the path. */
+ */ /* Returns true if the attribute is Set for the path. */
 #define ATTR_TRUE(v) ((v) == git_attr__true)
 
 /* Returns true if the attribute is Unset for the path. */
@@ -169,93 +163,70 @@ extern const char git_attr__false[];
 /* Returns true if the attribute is Unspecified for the path. */
 #define ATTR_UNSET(v) ((v) == NULL)
 
-/* This structure represents one attribute and its value. */
-struct attr_check_item {
-	const struct git_attr *attr;
-	const char *value;
-};
+/* This structure represents one attribute and its value. */ struct attr_check_item { const struct git_attr * attr; const char * value; };
 
 /**
  * This structure represents a collection of `attr_check_item`. It is passed to
  * `git_check_attr()` function, specifying the attributes to check, and
  * receives their values.
- */
-struct attr_check {
-	int nr;
-	int alloc;
-	struct attr_check_item *items;
-	int all_attrs_nr;
-	struct all_attrs_item *all_attrs;
-	struct attr_stack *stack;
+ */ struct attr_check
+{
+    int nr;
+    int alloc;
+    struct attr_check_item * items;
+    int all_attrs_nr;
+    struct all_attrs_item * all_attrs;
+    struct attr_stack * stack;
 };
 
-struct attr_check *attr_check_alloc(void);
+struct attr_check * attr_check_alloc(void);
 
-LAST_ARG_MUST_BE_NULL
-struct attr_check *attr_check_initl(const char *, ...);
-struct attr_check *attr_check_dup(const struct attr_check *check);
+LAST_ARG_MUST_BE_NULL struct attr_check * attr_check_initl(const char * , ...);
+struct attr_check * attr_check_dup(const struct attr_check * check);
 
-struct attr_check_item *attr_check_append(struct attr_check *check,
-					  const struct git_attr *attr);
+struct attr_check_item * attr_check_append(struct attr_check * check, const struct git_attr * attr);
 
-void attr_check_reset(struct attr_check *check);
-void attr_check_clear(struct attr_check *check);
-void attr_check_free(struct attr_check *check);
+void attr_check_reset(struct attr_check * check);
+void attr_check_clear(struct attr_check * check);
+void attr_check_free(struct attr_check * check);
 
 /*
  * Return the name of the attribute represented by the argument.  The
  * return value is a pointer to a null-delimited string that is part
  * of the internal data structure; it should not be modified or freed.
- */
-const char *git_attr_name(const struct git_attr *);
+ */ const char * git_attr_name
+(
+    const struct git_attr * 
+);
 
-void git_check_attr(struct index_state *istate,
-		    const char *path,
-		    struct attr_check *check);
+void git_check_attr(struct index_state * istate, const char * path, struct attr_check * check);
 
 /*
  * Retrieve all attributes that apply to the specified path.
  * check holds the attributes and their values.
- */
-void git_all_attrs(struct index_state *istate,
-		   const char *path, struct attr_check *check);
+ */ void git_all_attrs
+(
+    struct index_state * istate, const char * path, struct attr_check * check
+);
 
-enum git_attr_direction {
-	GIT_ATTR_CHECKIN,
-	GIT_ATTR_CHECKOUT,
-	GIT_ATTR_INDEX
-};
+enum git_attr_direction { GIT_ATTR_CHECKIN, GIT_ATTR_CHECKOUT, GIT_ATTR_INDEX };
 void git_attr_set_direction(enum git_attr_direction new_direction);
 
 void attr_start(void);
 
-/* Return the system gitattributes file. */
-const char *git_attr_system_file(void);
+/* Return the system gitattributes file. */ const char * git_attr_system_file(void);
 
-/* Return the global gitattributes file, if any. */
-const char *git_attr_global_file(void);
+/* Return the global gitattributes file, if any. */ const char * git_attr_global_file(void);
 
-/* Return whether the system gitattributes file is enabled and should be used. */
-int git_attr_system_is_enabled(void);
+/* Return whether the system gitattributes file is enabled and should be used. */ int git_attr_system_is_enabled(void);
 
-extern char *git_attr_tree;
+extern char * git_attr_tree;
 
 /*
  * Exposed for fuzz-testing only.
- */
+ */ /* What does a matched pattern decide? */ struct attr_state { const struct git_attr * attr; const char * setto; };
 
-/* What does a matched pattern decide? */
-struct attr_state {
-	const struct git_attr *attr;
-	const char *setto;
-};
-
-struct pattern {
-	const char *pattern;
-	int patternlen;
-	int nowildcardlen;
-	unsigned flags;		/* PATTERN_FLAG_* */
-};
+struct pattern { const char * pattern; int patternlen; int nowildcardlen; unsigned flags; /* PATTERN_FLAG_* */ };
 
 /*
  * One rule, as from a .gitattributes file.
@@ -269,18 +240,14 @@ struct pattern {
  * In either case, num_attr is the number of attributes affected by
  * this rule, and state is an array listing them.  The attributes are
  * listed as they appear in the file (macros unexpanded).
- */
-struct match_attr {
-	union {
-		struct pattern pat;
-		const struct git_attr *attr;
-	} u;
-	char is_macro;
-	size_t num_attr;
-	struct attr_state state[FLEX_ARRAY];
+ */ struct match_attr
+{
+    union { struct pattern pat; const struct git_attr * attr; }
+    u;
+    char is_macro;
+    size_t num_attr;
+    struct attr_state state[FLEX_ARRAY];
 };
 
-struct match_attr *parse_attr_line(const char *line, const char *src,
-				   int lineno, unsigned flags);
-
+struct match_attr * parse_attr_line(const char * line, const char * src, int lineno, unsigned flags);
 #endif /* ATTR_H */

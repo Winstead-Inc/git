@@ -1,12 +1,9 @@
 #ifndef COMMIT_SLAB_IMPL_H
 #define COMMIT_SLAB_IMPL_H
-
 #define implement_static_commit_slab(slabname, elemtype) \
 	implement_commit_slab(slabname, elemtype, MAYBE_UNUSED static)
-
 #define implement_shared_commit_slab(slabname, elemtype) \
 	implement_commit_slab(slabname, elemtype, )
-
 #define implement_commit_slab(slabname, elemtype, scope)		\
 									\
 scope void init_ ##slabname## _with_stride(struct slabname *s,		\
@@ -101,5 +98,4 @@ struct slabname
  * be a syntax error according (at least) to ISO C.  It's hard to
  * catch because GCC silently parses it by default.
  */
-
 #endif	/* COMMIT_SLAB_IMPL_H */

@@ -21,7 +21,6 @@ struct strbuf;
  * We allocate space for 7 attributes.
  */
 #define COLOR_MAXLEN 75
-
 #define GIT_COLOR_NORMAL	""
 #define GIT_COLOR_RESET		"\033[m"
 #define GIT_COLOR_BOLD		"\033[1m"
@@ -72,26 +71,20 @@ struct strbuf;
  * The first three are chosen to match common usage in the code, and what is
  * returned from git_config_colorbool. The "auto" value can be returned from
  * config_colorbool, and will be converted by want_color() into either 0 or 1.
- */
-enum git_colorbool {
-	GIT_COLOR_UNKNOWN = -1,
-	GIT_COLOR_NEVER = 0,
-	GIT_COLOR_ALWAYS = 1,
-	GIT_COLOR_AUTO = 2,
+ */ enum git_colorbool
+{
+    GIT_COLOR_UNKNOWN = - 1, GIT_COLOR_NEVER = 0, GIT_COLOR_ALWAYS = 1, GIT_COLOR_AUTO = 2, 
 };
 
-/* A default list of colors to use for commit graphs and show-branch output */
-extern const char *column_colors_ansi[];
+/* A default list of colors to use for commit graphs and show-branch output */ extern const char * column_colors_ansi[];
 extern const int column_colors_ansi_max;
 
 /*
  * Generally the color code will lazily figure this out itself, but
  * this provides a mechanism for callers to override autodetection.
- */
-extern int color_stdout_is_tty;
+ */ extern int color_stdout_is_tty;
 
-/* Parse color config. */
-int git_color_config(const char *var, const char *value, void *cb);
+/* Parse color config. */ int git_color_config(const char * var , const char * value, void * cb);
 
 /*
  * Parse a config option, which can be a boolean or one of
@@ -99,14 +92,18 @@ int git_color_config(const char *var, const char *value, void *cb);
  * GIT_COLOR_NEVER for "never" or negative boolean,
  * GIT_COLOR_ALWAYS for "always" or a positive boolean,
  * and GIT_COLOR_AUTO for "auto".
- */
-enum git_colorbool git_config_colorbool(const char *var, const char *value);
+ */ enum git_colorbool git_config_colorbool
+(
+    const char * var, const char * value
+);
 
 /*
  * Return a boolean whether to use color, where the argument 'var' is
  * one of GIT_COLOR_UNKNOWN, GIT_COLOR_NEVER, GIT_COLOR_ALWAYS, GIT_COLOR_AUTO.
- */
-bool want_color_fd(int fd, enum git_colorbool var);
+ */ bool want_color_fd
+(
+    int fd, enum git_colorbool var
+);
 #define want_color(colorbool) want_color_fd(1, (colorbool))
 #define want_color_stderr(colorbool) want_color_fd(2, (colorbool))
 
@@ -116,10 +113,12 @@ bool want_color_fd(int fd, enum git_colorbool var);
  * "foreground [background] [attr]" where fore- and background can be a color
  * name ("red"), a RGB code (#FF0000 or #F00) or a 256-color-mode from the
  * terminal.
- */
-int color_parse(const char *value, char *dst);
-int color_parse_quietly(const char *value, char *dst);
-int color_parse_mem(const char *value, int len, char *dst);
+ */ int color_parse
+(
+    const char * value, char * dst
+);
+int color_parse_quietly(const char * value, char * dst);
+int color_parse_mem(const char * value, int len, char * dst);
 
 /*
  * Output the formatted string in the specified color (and then reset to normal
@@ -127,17 +126,19 @@ int color_parse_mem(const char *value, int len, char *dst);
  * `color` is NULL. The `color_fprintf_ln` prints a new line after resetting
  * the color.  The `color_print_strbuf` prints the contents of the given
  * strbuf (BUG: but only up to its first NUL character).
- */
-__attribute__((format (printf, 3, 4)))
-int color_fprintf(FILE *fp, const char *color, const char *fmt, ...);
-__attribute__((format (printf, 3, 4)))
-int color_fprintf_ln(FILE *fp, const char *color, const char *fmt, ...);
-void color_print_strbuf(FILE *fp, const char *color, const struct strbuf *sb);
+ */ __attribute__
+((
+    format(printf, 3, 4)
+))
+int color_fprintf(FILE * fp, const char * color, const char * fmt, ...);
+__attribute__((format(printf, 3, 4))) int color_fprintf_ln(FILE * fp, const char * color, const char * fmt, ...);
+void color_print_strbuf(FILE * fp, const char * color, const struct strbuf * sb);
 
 /*
  * Check if the given color is GIT_COLOR_NIL that means "no color selected".
  * The caller needs to replace the color with the actual desired color.
- */
-int color_is_nil(const char *color);
-
+ */ int color_is_nil
+(
+    const char * color
+);
 #endif /* COLOR_H */

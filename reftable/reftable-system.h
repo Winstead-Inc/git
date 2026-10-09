@@ -7,12 +7,10 @@
  * gaps between POSIX and your system, as well as the zlib interfaces. This
  * header is expected to be changed by the individual project.
  */
-
 #define MINGW_DONT_HANDLE_IN_USE_ERROR
 #include "compat/posix.h"
 #include "compat/zlib-compat.h"
 
 int reftable_fsync(int fd);
 #define fsync(fd) reftable_fsync(fd)
-
 #endif

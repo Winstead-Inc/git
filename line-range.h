@@ -18,14 +18,12 @@ struct index_state;
  * actual range is stored in *begin and *end.  The counting starts
  * at 1!  In case of error, the caller should show usage message.
  */
+typedef const char * ( * nth_line_fn_t)(void * data, long lno);
 
-typedef const char *(*nth_line_fn_t)(void *data, long lno);
-
-int parse_range_arg(const char *arg,
-		    nth_line_fn_t nth_line_cb,
-		    void *cb_data, long lines, long anchor,
-		    long *begin, long *end,
-		    const char *path, struct index_state *istate);
+int parse_range_arg
+(
+    const char * arg, nth_line_fn_t nth_line_cb, void * cb_data, long lines, long anchor, long * begin, long * end, const char * path, struct index_state * istate
+);
 
 /*
  * Scan past a range argument that could be parsed by
@@ -35,7 +33,5 @@ int parse_range_arg(const char *arg,
  * Returns a pointer to the first character after the 'n,m' part, or
  * NULL in case the argument is obviously malformed.
  */
-
-const char *skip_range_arg(const char *arg, struct index_state *istate);
-
+const char * skip_range_arg(const char * arg, struct index_state * istate);
 #endif /* LINE_RANGE_H */

@@ -1,6 +1,5 @@
 #ifndef PARSE_OPTIONS_H
 #define PARSE_OPTIONS_H
-
 #include "gettext.h"
 
 struct repository;
@@ -8,75 +7,33 @@ struct repository;
 /**
  * Refer to Documentation/technical/api-parse-options.adoc for the API doc.
  */
-
-enum parse_opt_type {
-	/* special types */
-	OPTION_END,
-	OPTION_GROUP,
-	OPTION_NUMBER,
-	OPTION_ALIAS,
-	OPTION_SUBCOMMAND,
-	/* options with no arguments */
-	OPTION_BIT,
-	OPTION_NEGBIT,
-	OPTION_BITOP,
-	OPTION_COUNTUP,
-	OPTION_SET_INT,
-	/* options with arguments (usually) */
-	OPTION_STRING,
-	OPTION_INTEGER,
-	OPTION_UNSIGNED,
-	OPTION_CALLBACK,
-	OPTION_LOWLEVEL_CALLBACK,
-	OPTION_FILENAME
+enum parse_opt_type
+{
+    /* special types */ OPTION_END, OPTION_GROUP, OPTION_NUMBER, OPTION_ALIAS, OPTION_SUBCOMMAND, /* options with no arguments */ OPTION_BIT, OPTION_NEGBIT, OPTION_BITOP, OPTION_COUNTUP, OPTION_SET_INT, /* options with arguments (usually) */ OPTION_STRING, OPTION_INTEGER, OPTION_UNSIGNED, OPTION_CALLBACK, OPTION_LOWLEVEL_CALLBACK, OPTION_FILENAME
 };
 
-enum parse_opt_flags {
-	PARSE_OPT_KEEP_DASHDASH = 1 << 0,
-	PARSE_OPT_STOP_AT_NON_OPTION = 1 << 1,
-	PARSE_OPT_KEEP_ARGV0 = 1 << 2,
-	PARSE_OPT_KEEP_UNKNOWN_OPT = 1 << 3,
-	PARSE_OPT_NO_INTERNAL_HELP = 1 << 4,
-	PARSE_OPT_ONE_SHOT = 1 << 5,
-	PARSE_OPT_SHELL_EVAL = 1 << 6,
-	PARSE_OPT_SUBCOMMAND_OPTIONAL = 1 << 7,
+enum parse_opt_flags
+{
+    PARSE_OPT_KEEP_DASHDASH = 1 << 0, PARSE_OPT_STOP_AT_NON_OPTION = 1 << 1, PARSE_OPT_KEEP_ARGV0 = 1 << 2, PARSE_OPT_KEEP_UNKNOWN_OPT = 1 << 3, PARSE_OPT_NO_INTERNAL_HELP = 1 << 4, PARSE_OPT_ONE_SHOT = 1 << 5, PARSE_OPT_SHELL_EVAL = 1 << 6, PARSE_OPT_SUBCOMMAND_OPTIONAL = 1 << 7, 
 };
 
-enum parse_opt_option_flags {
-	PARSE_OPT_OPTARG  = 1 << 0,
-	PARSE_OPT_NOARG   = 1 << 1,
-	PARSE_OPT_NONEG   = 1 << 2,
-	PARSE_OPT_HIDDEN  = 1 << 3,
-	PARSE_OPT_LASTARG_DEFAULT = 1 << 4,
-	PARSE_OPT_NODASH = 1 << 5,
-	PARSE_OPT_LITERAL_ARGHELP = 1 << 6,
-	PARSE_OPT_FROM_ALIAS = 1 << 7,
-	PARSE_OPT_NOCOMPLETE = 1 << 9,
-	PARSE_OPT_COMP_ARG = 1 << 10,
-	PARSE_OPT_CMDMODE = 1 << 11,
+enum parse_opt_option_flags
+{
+    PARSE_OPT_OPTARG = 1 << 0, PARSE_OPT_NOARG = 1 << 1, PARSE_OPT_NONEG = 1 << 2, PARSE_OPT_HIDDEN = 1 << 3, PARSE_OPT_LASTARG_DEFAULT = 1 << 4, PARSE_OPT_NODASH = 1 << 5, PARSE_OPT_LITERAL_ARGHELP = 1 << 6, PARSE_OPT_FROM_ALIAS = 1 << 7, PARSE_OPT_NOCOMPLETE = 1 << 9, PARSE_OPT_COMP_ARG = 1 << 10, PARSE_OPT_CMDMODE = 1 << 11, 
 };
 
-enum parse_opt_result {
-	PARSE_OPT_COMPLETE = -4,
-	PARSE_OPT_HELP_ERROR = -3,
-	PARSE_OPT_HELP = -2,
-	PARSE_OPT_ERROR = -1,	/* must be the same as error() */
-	PARSE_OPT_DONE = 0,	/* fixed so that "return 0" works */
-	PARSE_OPT_NON_OPTION,
-	PARSE_OPT_SUBCOMMAND,
-	PARSE_OPT_UNKNOWN
+enum parse_opt_result
+{
+    PARSE_OPT_COMPLETE = - 4, PARSE_OPT_HELP_ERROR = - 3, PARSE_OPT_HELP = - 2, PARSE_OPT_ERROR = - 1, /* must be the same as error() */ PARSE_OPT_DONE = 0, /* fixed so that "return 0" works */ PARSE_OPT_NON_OPTION, PARSE_OPT_SUBCOMMAND, PARSE_OPT_UNKNOWN
 };
 
 struct option;
-typedef int parse_opt_cb(const struct option *, const char *arg, int unset);
+typedef int parse_opt_cb(const struct option * , const char * arg, int unset);
 
 struct parse_opt_ctx_t;
-typedef enum parse_opt_result parse_opt_ll_cb(struct parse_opt_ctx_t *ctx,
-					      const struct option *opt,
-					      const char *arg, int unset);
+typedef enum parse_opt_result parse_opt_ll_cb(struct parse_opt_ctx_t * ctx, const struct option * opt, const char * arg, int unset);
 
-typedef int parse_opt_subcommand_fn(int argc, const char **argv,
-				    const char *prefix, struct repository *repo);
+typedef int parse_opt_subcommand_fn(int argc, const char ** argv, const char * prefix, struct repository * repo);
 
 /*
  * `type`::
@@ -151,24 +108,23 @@ typedef int parse_opt_subcommand_fn(int argc, const char **argv,
  * `subcommand_fn`::
  *   pointer to a function to use for OPTION_SUBCOMMAND.
  *   It will be put in value when the subcommand is given on the command line.
- */
-struct option {
-	enum parse_opt_type type;
-	int short_name;
-	const char *long_name;
-	void *value;
-	size_t precision;
-	const char *argh;
-	const char *help;
+ */ struct option
+{
+    enum parse_opt_type type;
+    int short_name;
+    const char * long_name;
+    void * value;
+    size_t precision;
+    const char * argh;
+    const char * help;
 
-	enum parse_opt_option_flags flags;
-	parse_opt_cb *callback;
-	intptr_t defval;
-	parse_opt_ll_cb *ll_callback;
-	intptr_t extra;
-	parse_opt_subcommand_fn *subcommand_fn;
+    enum parse_opt_option_flags flags;
+    parse_opt_cb * callback;
+    intptr_t defval;
+    parse_opt_ll_cb * ll_callback;
+    intptr_t extra;
+    parse_opt_subcommand_fn * subcommand_fn;
 };
-
 #define OPT_BIT_F(s, l, v, h, b, f) { \
 	.type = OPTION_BIT, \
 	.short_name = (s), \
@@ -229,7 +185,6 @@ struct option {
 	.help = (h), \
 	.flags = (f), \
 }
-
 #define OPT_END() { \
 	.type = OPTION_END, \
 }
@@ -288,7 +243,6 @@ struct option {
 	.defval = (i), \
 }
 #define OPT_CMDMODE(s, l, v, h, i)  OPT_CMDMODE_F(s, l, v, h, i, 0)
-
 #define OPT_INTEGER(s, l, v, h)     OPT_INTEGER_F(s, l, v, h, 0)
 #define OPT_UNSIGNED(s, l, v, h) { \
 	.type = OPTION_UNSIGNED, \
@@ -364,7 +318,6 @@ struct option {
 	.callback = parse_opt_color_flag_cb, \
 	.defval = (intptr_t)"always", \
 }
-
 #define OPT_NOOP_NOARG(s, l) { \
 	.type = OPTION_CALLBACK, \
 	.short_name = (s), \
@@ -374,7 +327,7 @@ struct option {
 	.callback = parse_opt_noop_cb, \
 }
 
-static char *parse_options_noop_ignored_value MAYBE_UNUSED;
+static char * parse_options_noop_ignored_value MAYBE_UNUSED;
 #define OPT_NOOP_ARG(s, l) { \
 	.type = OPTION_CALLBACK, \
 	.short_name = (s), \
@@ -385,7 +338,6 @@ static char *parse_options_noop_ignored_value MAYBE_UNUSED;
 	.flags = PARSE_OPT_HIDDEN, \
 	.callback = parse_opt_noop_cb, \
 }
-
 #define OPT_ALIAS_F(s, l, source_long_name, f) { \
 	.type = OPTION_ALIAS, \
 	.short_name = (s), \
@@ -393,9 +345,7 @@ static char *parse_options_noop_ignored_value MAYBE_UNUSED;
 	.value = (char *)(source_long_name), \
 	.flags = (f), \
 }
-
 #define OPT_ALIAS(s, l, source_long_name) OPT_ALIAS_F(s, l, source_long_name, 0)
-
 #define OPT_SUBCOMMAND_F(l, v, fn, f) { \
 	.type = OPTION_SUBCOMMAND, \
 	.long_name = (l), \
@@ -417,56 +367,40 @@ static char *parse_options_noop_ignored_value MAYBE_UNUSED;
  * In one-shot mode, argv0 is not a program name, argv[] is left
  * untouched and parse_options() returns the number of options
  * processed.
- */
-int parse_options(int argc, const char **argv, const char *prefix,
-		  const struct option *options,
-		  const char * const usagestr[],
-		  enum parse_opt_flags flags);
+ */ int parse_options
+(
+    int argc, const char ** argv, const char * prefix, const struct option * options, const char * const usagestr[], enum parse_opt_flags flags
+);
 
-NORETURN void usage_with_options(const char * const *usagestr,
-				 const struct option *options);
+NORETURN void usage_with_options(const char * const * usagestr, const struct option * options);
 
-void show_usage_with_options_if_asked(int ac, const char **av,
-				      const char * const *usage,
-				      const struct option *options);
+void show_usage_with_options_if_asked(int ac, const char ** av, const char * const * usage, const struct option * options);
 
-NORETURN void usage_msg_opt(const char *msg,
-			    const char * const *usagestr,
-			    const struct option *options);
+NORETURN void usage_msg_opt(const char * msg, const char * const * usagestr, const struct option * options);
 
 /**
  * usage_msg_optf() is like usage_msg_opt() except that the first
  * argument is a format string, and optional format arguments follow
  * after the 3rd option.
- */
-__attribute__((format (printf,1,4)))
-void NORETURN usage_msg_optf(const char *fmt,
-			     const char * const *usagestr,
-			     const struct option *options, ...);
+ */ __attribute__
+((
+    format(printf, 1, 4)
+))
+void NORETURN usage_msg_optf(const char * fmt, const char * const * usagestr, const struct option * options, ...);
 
-void die_for_incompatible_opt4(int opt1, const char *opt1_name,
-			       int opt2, const char *opt2_name,
-			       int opt3, const char *opt3_name,
-			       int opt4, const char *opt4_name);
+void die_for_incompatible_opt4
+(
+    int opt1, const char * opt1_name, int opt2, const char * opt2_name, int opt3, const char * opt3_name, int opt4, const char * opt4_name
+);
 
-
-static inline void die_for_incompatible_opt3(int opt1, const char *opt1_name,
-					     int opt2, const char *opt2_name,
-					     int opt3, const char *opt3_name)
+static inline void die_for_incompatible_opt3(int opt1, const char * opt1_name, int opt2, const char * opt2_name, int opt3, const char * opt3_name)
 {
-	die_for_incompatible_opt4(opt1, opt1_name,
-				  opt2, opt2_name,
-				  opt3, opt3_name,
-				  0, "");
+    die_for_incompatible_opt4(opt1, opt1_name, opt2, opt2_name, opt3, opt3_name, 0, "");
 }
 
-static inline void die_for_incompatible_opt2(int opt1, const char *opt1_name,
-					     int opt2, const char *opt2_name)
+static inline void die_for_incompatible_opt2(int opt1, const char * opt1_name, int opt2, const char * opt2_name)
 {
-	die_for_incompatible_opt4(opt1, opt1_name,
-				  opt2, opt2_name,
-				  0, "",
-				  0, "");
+    die_for_incompatible_opt4(opt1, opt1_name, opt2, opt2_name, 0, "", 0, "");
 }
 
 /*
@@ -495,60 +429,52 @@ static inline void die_for_incompatible_opt2(int opt1, const char *opt1_name,
 } while(0)
 
 /*----- incremental advanced APIs -----*/
-
 struct parse_opt_cmdmode_list;
 
 /*
  * It's okay for the caller to consume argv/argc in the usual way.
  * Other fields of that structure are private to parse-options and should not
  * be modified in any way.
- */
-struct parse_opt_ctx_t {
-	const char **argv;
-	const char **out;
-	int argc, cpidx, total;
-	const char *opt;
-	enum parse_opt_flags flags;
-	unsigned has_subcommands;
-	const char *prefix;
-	const char **alias_groups; /* must be in groups of 3 elements! */
-	struct parse_opt_cmdmode_list *cmdmode_list;
+ */ struct parse_opt_ctx_t
+{
+    const char ** argv;
+    const char ** out;
+    int argc, cpidx, total;
+    const char * opt;
+    enum parse_opt_flags flags;
+    unsigned has_subcommands;
+    const char * prefix;
+    const char ** alias_groups;
+/* must be in groups of 3 elements! */ struct parse_opt_cmdmode_list * cmdmode_list;
 };
 
-void parse_options_start(struct parse_opt_ctx_t *ctx,
-			 int argc, const char **argv, const char *prefix,
-			 const struct option *options,
-			 enum parse_opt_flags flags);
+void parse_options_start
+(
+    struct parse_opt_ctx_t * ctx, int argc, const char ** argv, const char * prefix, const struct option * options, enum parse_opt_flags flags
+);
 
-enum parse_opt_result parse_options_step(struct parse_opt_ctx_t *ctx,
-					 const struct option *options,
-					 const char * const usagestr[]);
+enum parse_opt_result parse_options_step(struct parse_opt_ctx_t * ctx, const struct option * options, const char * const usagestr[]);
 
-int parse_options_end(struct parse_opt_ctx_t *ctx);
+int parse_options_end(struct parse_opt_ctx_t * ctx);
 
-struct option *parse_options_dup(const struct option *a);
-struct option *parse_options_concat(const struct option *a, const struct option *b);
+struct option * parse_options_dup(const struct option * a);
+struct option * parse_options_concat(const struct option * a, const struct option * b);
 
-/*----- some often used options -----*/
-int parse_opt_abbrev_cb(const struct option *, const char *, int);
-int parse_opt_expiry_date_cb(const struct option *, const char *, int);
-int parse_opt_color_flag_cb(const struct option *, const char *, int);
-int parse_opt_verbosity_cb(const struct option *, const char *, int);
-/* value is struct oid_array* */
-int parse_opt_object_name(const struct option *, const char *, int);
-/* value is struct object_id* */
-int parse_opt_object_id(const struct option *, const char *, int);
-int parse_opt_commits(const struct option *, const char *, int);
-int parse_opt_commit(const struct option *, const char *, int);
-int parse_opt_tertiary(const struct option *, const char *, int);
-int parse_opt_string_list(const struct option *, const char *, int);
-int parse_opt_strvec(const struct option *, const char *, int);
-int parse_opt_noop_cb(const struct option *, const char *, int);
-int parse_opt_passthru(const struct option *, const char *, int);
-int parse_opt_passthru_argv(const struct option *, const char *, int);
-/* value is enum branch_track* */
-int parse_opt_tracking_mode(const struct option *, const char *, int);
-
+/*----- some often used options -----*/ int parse_opt_abbrev_cb(const struct option * , const char * , int);
+int parse_opt_expiry_date_cb(const struct option * , const char * , int);
+int parse_opt_color_flag_cb(const struct option * , const char * , int);
+int parse_opt_verbosity_cb(const struct option * , const char * , int);
+/* value is struct oid_array* */ int parse_opt_object_name(const struct option * , const char * , int);
+/* value is struct object_id* */ int parse_opt_object_id(const struct option * , const char * , int);
+int parse_opt_commits(const struct option * , const char * , int);
+int parse_opt_commit(const struct option * , const char * , int);
+int parse_opt_tertiary(const struct option * , const char * , int);
+int parse_opt_string_list(const struct option * , const char * , int);
+int parse_opt_strvec(const struct option * , const char * , int);
+int parse_opt_noop_cb(const struct option * , const char * , int);
+int parse_opt_passthru(const struct option * , const char * , int);
+int parse_opt_passthru_argv(const struct option * , const char * , int);
+/* value is enum branch_track* */ int parse_opt_tracking_mode(const struct option * , const char * , int);
 #define OPT__VERBOSE(var, h)  OPT_COUNTUP('v', "verbose", (var), (h))
 #define OPT__QUIET(var, h)    OPT_COUNTUP('q', "quiet",   (var), (h))
 #define OPT__VERBOSITY(var) { \
@@ -582,7 +508,6 @@ int parse_opt_tracking_mode(const struct option *, const char *, int);
 #define OPT__SUPER_PREFIX(var) \
 	OPT_STRING_F(0, "super-prefix", (var), N_("prefix"), \
 		N_("prefixed path to initial superproject"), PARSE_OPT_HIDDEN)
-
 #define OPT__COLOR(var, h) \
 	OPT_COLOR_FLAG(0, "color", (var), (h))
 #define OPT_COLUMN(s, l, v, h) { \
@@ -635,11 +560,9 @@ int parse_opt_tracking_mode(const struct option *, const char *, int);
 #define OPT_AUTOSTASH(v) OPT_BOOL(0, "autostash", v, N_("automatically stash/stash pop before and after"))
 #define OPT_DIFF_UNIFIED(v) OPT_INTEGER_F('U', "unified", v, N_("generate diffs with <n> lines context"), PARSE_OPT_NONEG)
 #define OPT_DIFF_INTERHUNK_CONTEXT(v) OPT_INTEGER_F(0, "inter-hunk-context", v, N_("show context between diff hunks up to the specified number of lines"), PARSE_OPT_NONEG)
-
 #define OPT_IPVERSION(v) \
 	OPT_SET_INT_F('4', "ipv4", (v), N_("use IPv4 addresses only"), \
 		TRANSPORT_FAMILY_IPV4, PARSE_OPT_NONEG), \
 	OPT_SET_INT_F('6', "ipv6", (v), N_("use IPv6 addresses only"), \
 		TRANSPORT_FAMILY_IPV6, PARSE_OPT_NONEG)
-
 #endif

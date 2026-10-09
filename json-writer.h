@@ -69,29 +69,25 @@
  * API.  This layer should not have to try to guess the encoding or locale
  * of the given strings.
  */
-
 #include "strbuf.h"
 
 struct json_writer
 {
-	/*
+    /*
 	 * Buffer of the in-progress JSON currently being composed.
-	 */
-	struct strbuf json;
+	 */ struct strbuf json;
 
-	/*
+    /*
 	 * Simple stack of the currently open array and object forms.
 	 * This is a string of '{' and '[' characters indicating the
 	 * currently unterminated forms.  This is used to ensure the
 	 * properly closing character is used when popping a level and
 	 * to know when the JSON is completely closed.
-	 */
-	struct strbuf open_stack;
+	 */ struct strbuf open_stack;
 
-	unsigned int need_comma:1;
-	unsigned int pretty:1;
+    unsigned int need_comma: 1;
+    unsigned int pretty: 1;
 };
-
 #define JSON_WRITER_INIT { \
 	.json = STRBUF_INIT, \
 	.open_stack = STRBUF_INIT, \
@@ -99,142 +95,168 @@ struct json_writer
 
 /*
  * Initialize a json_writer with empty values.
- */
-void jw_init(struct json_writer *jw);
+ */ void jw_init(struct json_writer * jw);
 
 /*
  * Release the internal buffers of a json_writer.
- */
-void jw_release(struct json_writer *jw);
+ */ void jw_release(struct json_writer * jw);
 
 /*
  * Begin the json_writer using an object as the top-level data structure. If
  * pretty is set to 1, the result will be a human-readable and indented JSON,
  * and if it is set to 0 the result will be minified single-line JSON.
- */
-void jw_object_begin(struct json_writer *jw, int pretty);
+ */ void jw_object_begin
+(
+    struct json_writer * jw, int pretty
+);
 
 /*
  * Begin the json_writer using an array as the top-level data structure. If
  * pretty is set to 1, the result will be a human-readable and indented JSON,
  * and if it is set to 0 the result will be minified single-line JSON.
- */
-void jw_array_begin(struct json_writer *jw, int pretty);
+ */ void jw_array_begin
+(
+    struct json_writer * jw, int pretty
+);
 
 /*
  * Append a string field to the current object of the json_writer, given its key
  * and its value. Trigger a BUG when not in an object.
- */
-void jw_object_string(struct json_writer *jw, const char *key,
-		      const char *value);
+ */ void jw_object_string
+(
+    struct json_writer * jw, const char * key, const char * value
+);
 
 /*
  * Append an int field to the current object of the json_writer, given its key
  * and its value. Trigger a BUG when not in an object.
- */
-void jw_object_intmax(struct json_writer *jw, const char *key, intmax_t value);
+ */ void jw_object_intmax
+(
+    struct json_writer * jw, const char * key, intmax_t value
+);
 
 /*
  * Append a double field to the current object of the json_writer, given its key
  * and its value. The precision parameter defines the number of significant
  * digits, where -1 can be used for maximum precision. Trigger a BUG when not in
  * an object.
- */
-void jw_object_double(struct json_writer *jw, const char *key, int precision,
-		      double value);
+ */ void jw_object_double
+(
+    struct json_writer * jw, const char * key, int precision, double value
+);
 
 /*
  * Append a boolean field set to true to the current object of the json_writer,
  * given its key. Trigger a BUG when not in an object.
- */
-void jw_object_true(struct json_writer *jw, const char *key);
+ */ void jw_object_true
+(
+    struct json_writer * jw, const char * key
+);
 
 /*
  * Append a boolean field set to false to the current object of the json_writer,
  * given its key. Trigger a BUG when not in an object.
- */
-void jw_object_false(struct json_writer *jw, const char *key);
+ */ void jw_object_false
+(
+    struct json_writer * jw, const char * key
+);
 
 /*
  * Append a boolean field to the current object of the json_writer, given its
  * key and its value. Trigger a BUG when not in an object.
- */
-void jw_object_bool(struct json_writer *jw, const char *key, int value);
+ */ void jw_object_bool
+(
+    struct json_writer * jw, const char * key, int value
+);
 
 /*
  * Append a null field to the current object of the json_writer, given its key.
  * Trigger a BUG when not in an object.
- */
-void jw_object_null(struct json_writer *jw, const char *key);
+ */ void jw_object_null
+(
+    struct json_writer * jw, const char * key
+);
 
 /*
  * Append a field to the current object of the json_writer, given its key and
  * another json_writer that represents its content. Trigger a BUG when not in
  * an object.
- */
-void jw_object_sub_jw(struct json_writer *jw, const char *key,
-		      const struct json_writer *value);
+ */ void jw_object_sub_jw
+(
+    struct json_writer * jw, const char * key, const struct json_writer * value
+);
 
 /*
  * Start an object as the value of a field in the current object of the
  * json_writer. Trigger a BUG when not in an object.
- */
-void jw_object_inline_begin_object(struct json_writer *jw, const char *key);
+ */ void jw_object_inline_begin_object
+(
+    struct json_writer * jw, const char * key
+);
 
 /*
  * Start an array as the value of a field in the current object of the
  * json_writer. Trigger a BUG when not in an object.
- */
-void jw_object_inline_begin_array(struct json_writer *jw, const char *key);
+ */ void jw_object_inline_begin_array
+(
+    struct json_writer * jw, const char * key
+);
 
 /*
  * Append a string value to the current array of the json_writer. Trigger a BUG
  * when not in an array.
- */
-void jw_array_string(struct json_writer *jw, const char *value);
+ */ void jw_array_string
+(
+    struct json_writer * jw, const char * value
+);
 
 /*
  * Append an int value to the current array of the json_writer. Trigger a BUG
  * when not in an array.
- */
-void jw_array_intmax(struct json_writer *jw, intmax_t value);
+ */ void jw_array_intmax
+(
+    struct json_writer * jw, intmax_t value
+);
 
 /*
  * Append a double value to the current array of the json_writer. The precision
  * parameter defines the number of significant digits, where -1 can be used for
  * maximum precision. Trigger a BUG when not in an array.
- */
-void jw_array_double(struct json_writer *jw, int precision, double value);
+ */ void jw_array_double
+(
+    struct json_writer * jw, int precision, double value
+);
 
 /*
  * Append a true value to the current array of the json_writer. Trigger a BUG
  * when not in an array.
- */
-void jw_array_true(struct json_writer *jw);
+ */ void jw_array_true(struct json_writer * jw);
 
 /*
  * Append a false value to the current array of the json_writer. Trigger a BUG
  * when not in an array.
- */
-void jw_array_false(struct json_writer *jw);
+ */ void jw_array_false(struct json_writer * jw);
 
 /*
  * Append a boolean value to the current array of the json_writer. Trigger a BUG
  * when not in an array.
- */
-void jw_array_bool(struct json_writer *jw, int value);
+ */ void jw_array_bool
+(
+    struct json_writer * jw, int value
+);
 
 /*
  * Append a null value to the current array of the json_writer. Trigger a BUG
  * when not in an array.
- */
-void jw_array_null(struct json_writer *jw);
+ */ void jw_array_null(struct json_writer * jw);
 
 /*
  * Append a json_writer as a value to the current array of the
  * json_writer. Trigger a BUG when not in an array.
- */
-void jw_array_sub_jw(struct json_writer *jw, const struct json_writer *value);
+ */ void jw_array_sub_jw
+(
+    struct json_writer * jw, const struct json_writer * value
+);
 
 /*
  * Append the first argc values from the argv array of strings to the current
@@ -242,32 +264,39 @@ void jw_array_sub_jw(struct json_writer *jw, const struct json_writer *value);
  *
  * This function does not provide safety for cases where the array has less than
  * argc values.
- */
-void jw_array_argc_argv(struct json_writer *jw, int argc, const char **argv);
+ */ void jw_array_argc_argv
+(
+    struct json_writer * jw, int argc, const char ** argv
+);
 
 /*
  * Append a null-terminated array of strings to the current array of the
  * json_writer. Trigger a BUG when not in an array.
- */
-void jw_array_argv(struct json_writer *jw, const char **argv);
+ */ void jw_array_argv
+(
+    struct json_writer * jw, const char ** argv
+);
 
 /*
  * Start an object as a value in the current array of the json_writer. Trigger a
  * BUG when not in an array.
- */
-void jw_array_inline_begin_object(struct json_writer *jw);
+ */ void jw_array_inline_begin_object
+(
+    struct json_writer * jw
+);
 
 /*
  * Start an array as a value in the current array. Trigger a BUG when not in an
  * array.
- */
-void jw_array_inline_begin_array(struct json_writer *jw);
+ */ void jw_array_inline_begin_array(struct json_writer * jw);
 
 /*
  * Return whether the json_writer is terminated. In other words, if the all the
  * objects and arrays are already closed.
- */
-int jw_is_terminated(const struct json_writer *jw);
+ */ int jw_is_terminated
+(
+    const struct json_writer * jw
+);
 
 /*
  * Terminates the current object or array of the json_writer. In other words,
@@ -275,7 +304,8 @@ int jw_is_terminated(const struct json_writer *jw);
  * is not closed.
  *
  * Abort the execution if there's no object or array that can be terminated.
- */
-void jw_end(struct json_writer *jw);
-
+ */ void jw_end
+(
+    struct json_writer * jw
+);
 #endif /* JSON_WRITER_H */

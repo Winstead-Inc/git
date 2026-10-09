@@ -13,11 +13,8 @@ struct repository;
 
 /*
  * The core logic for pack-refs and its clones.
- */
-int pack_refs_core(int argc,
-		   const char **argv,
-		   const char *prefix,
-		   struct repository *repo,
-		   const char * const *usage_opts);
-
+ */ int pack_refs_core
+(
+    int argc, const char ** argv, const char * prefix, struct repository * repo, const char * const * usage_opts
+);
 #endif /* PACK_REFS_H */

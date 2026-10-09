@@ -20,48 +20,54 @@
  *		die("failed...tmp_objdir will clean up for us");
  *
  */
-
 struct repository;
 struct tmp_objdir;
 
 /*
  * Create a new temporary object directory with the specified prefix;
  * returns NULL on failure.
- */
-struct tmp_objdir *tmp_objdir_create(struct repository *r, const char *prefix);
+ */ struct tmp_objdir * tmp_objdir_create
+(
+    struct repository * r, const char * prefix
+);
 
 /*
  * Return a list of environment strings, suitable for use with
  * child_process.env, that can be passed to child programs to make use of the
  * temporary object directory.
- */
-const char **tmp_objdir_env(const struct tmp_objdir *);
+ */ const char ** tmp_objdir_env
+(
+    const struct tmp_objdir * 
+);
 
 /*
  * Finalize a temporary object directory by migrating its objects into the main
  * object database, removing the temporary directory, and freeing any
  * associated resources.
- */
-int tmp_objdir_migrate(struct tmp_objdir *);
+ */ int tmp_objdir_migrate
+(
+    struct tmp_objdir * 
+);
 
 /*
  * Destroy a temporary object directory, discarding any objects it contains.
- */
-int tmp_objdir_destroy(struct tmp_objdir *);
+ */ int tmp_objdir_destroy(struct tmp_objdir *);
 
 /*
  * Remove all objects from the temporary object directory, while leaving it
  * around so more objects can be added.
- */
-void tmp_objdir_discard_objects(struct tmp_objdir *);
+ */ void tmp_objdir_discard_objects
+(
+    struct tmp_objdir * 
+);
 
 /*
  * Replaces the writable object store in the current process with the temporary
  * object directory and makes the former main object store an alternate.
  * If will_destroy is nonzero, the object directory may not be migrated. Returns
  * the newly installed primary source.
- */
-struct odb_source *tmp_objdir_replace_primary_odb(struct tmp_objdir *,
-						  int will_destroy);
-
+ */ struct odb_source * tmp_objdir_replace_primary_odb
+(
+    struct tmp_objdir * , int will_destroy
+);
 #endif /* TMP_OBJDIR_H */

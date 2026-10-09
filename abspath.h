@@ -2,13 +2,11 @@
 #define ABSPATH_H
 
 int is_directory(const char *);
-char *strbuf_realpath(struct strbuf *resolved, const char *path,
-		      int die_on_error);
-char *strbuf_realpath_forgiving(struct strbuf *resolved, const char *path,
-				int die_on_error);
-char *real_pathdup(const char *path, int die_on_error);
-const char *absolute_path(const char *path);
-char *absolute_pathdup(const char *path);
+char * strbuf_realpath(struct strbuf * resolved, const char * path, int die_on_error);
+char * strbuf_realpath_forgiving(struct strbuf * resolved, const char * path, int die_on_error);
+char * real_pathdup(const char * path, int die_on_error);
+const char * absolute_path(const char * path);
+char * absolute_pathdup(const char * path);
 
 /*
  * Concatenate "prefix" (if len is non-zero) and "path", with no
@@ -19,23 +17,23 @@ char *absolute_pathdup(const char *path);
  *
  * The return value is always a newly allocated string (even if the
  * prefix was empty).
- */
-char *prefix_filename(const char *prefix, const char *path);
+ */ char * prefix_filename
+(
+    const char * prefix, const char * path
+);
 
-/* Likewise, but path=="-" always yields "-" */
-char *prefix_filename_except_for_dash(const char *prefix, const char *path);
+/* Likewise, but path=="-" always yields "-" */ char * prefix_filename_except_for_dash(const char * prefix, const char * path);
 
-static inline int is_absolute_path(const char *path)
-{
-	return is_dir_sep(path[0]) || has_dos_drive_prefix(path);
-}
+static inline int is_absolute_path(const char * path) { return is_dir_sep(path[0]) || has_dos_drive_prefix(path); }
 
 /**
  * Add a path to a buffer, converting a relative path to an
  * absolute one in the process.  Symbolic links are not
  * resolved.
- */
-void strbuf_add_absolute_path(struct strbuf *sb, const char *path);
+ */ void strbuf_add_absolute_path
+(
+    struct strbuf * sb, const char * path
+);
 
 /**
  * Canonize `path` (make it absolute, resolve symlinks, remove extra
@@ -48,7 +46,8 @@ void strbuf_add_absolute_path(struct strbuf *sb, const char *path);
  *
  * Callers that don't mind links should use the more lightweight
  * strbuf_add_absolute_path() instead.
- */
-void strbuf_add_real_path(struct strbuf *sb, const char *path);
-
+ */ void strbuf_add_real_path
+(
+    struct strbuf * sb, const char * path
+);
 #endif /* ABSPATH_H */

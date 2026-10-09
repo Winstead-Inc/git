@@ -1,17 +1,11 @@
 #ifndef GIT_FSCK_H
 #define GIT_FSCK_H
-
 #include "object.h"
 #include "oidset.h"
 
-enum fsck_msg_type {
-	/* for internal use only */
-	FSCK_IGNORE,
-	FSCK_INFO,
-	FSCK_FATAL,
-	/* "public", fed to e.g. error_func callbacks */
-	FSCK_ERROR,
-	FSCK_WARN,
+enum fsck_msg_type
+{
+    /* for internal use only */ FSCK_IGNORE, FSCK_INFO, FSCK_FATAL, /* "public", fed to e.g. error_func callbacks */ FSCK_ERROR, FSCK_WARN, 
 };
 
 /*
@@ -19,7 +13,6 @@ enum fsck_msg_type {
  * modifying this list in any way, make sure to keep the
  * two in sync.
  */
-
 #define FOREACH_FSCK_MSG_ID(FUNC) \
 	/* fatal errors */ \
 	FUNC(NUL_IN_HEADER, FATAL) \
@@ -102,24 +95,17 @@ enum fsck_msg_type {
 	FUNC(TRAILING_REF_CONTENT, INFO) \
 	/* ignored (elevated when requested) */ \
 	FUNC(EXTRA_HEADER_ENTRY, IGNORE)
-
 #define MSG_ID(id, msg_type) FSCK_MSG_##id,
-enum fsck_msg_id {
-	FOREACH_FSCK_MSG_ID(MSG_ID)
-	FSCK_MSG_MAX
-};
+enum fsck_msg_id { FOREACH_FSCK_MSG_ID(MSG_ID) FSCK_MSG_MAX };
 #undef MSG_ID
 
 struct fsck_options;
 struct object;
 
-void fsck_set_msg_type_from_ids(struct fsck_options *options,
-				enum fsck_msg_id msg_id,
-				enum fsck_msg_type msg_type);
-void fsck_set_msg_type(struct fsck_options *options,
-		       const char *msg_id, const char *msg_type);
-void fsck_set_msg_types(struct fsck_options *options, const char *values);
-int is_valid_msg_type(const char *msg_id, const char *msg_type);
+void fsck_set_msg_type_from_ids(struct fsck_options * options, enum fsck_msg_id msg_id, enum fsck_msg_type msg_type);
+void fsck_set_msg_type(struct fsck_options * options, const char * msg_id, const char * msg_type);
+void fsck_set_msg_types(struct fsck_options * options, const char * values);
+int is_valid_msg_type(const char * msg_id, const char * msg_type);
 
 /*
  * callback function for fsck_walk
@@ -128,59 +114,52 @@ int is_valid_msg_type(const char *msg_id, const char *msg_type);
  *     0	everything OK
  *     <0	error signaled and abort
  *     >0	error signaled and do not abort
- */
-typedef int (*fsck_walk_func)(struct object *obj, enum object_type object_type,
-			      void *data, struct fsck_options *options);
+ */ typedef int
+(
+    * fsck_walk_func
+)
+(struct object * obj, enum object_type object_type, void * data, struct fsck_options * options);
 
 /*
  * Callback for reporting errors either for objects or refs. The "fsck_report"
  * is a generic pointer that can be used to pass any information.
- */
-typedef int (*fsck_error)(struct fsck_options *o,
-			  void *fsck_report,
-			  enum fsck_msg_type msg_type, enum fsck_msg_id msg_id,
-			  const char *message);
+ */ typedef int
+(
+    * fsck_error
+)
+(struct fsck_options * o, void * fsck_report, enum fsck_msg_type msg_type, enum fsck_msg_id msg_id, const char * message);
 
-int fsck_objects_error_function(struct fsck_options *o,
-				void *fsck_report,
-				enum fsck_msg_type msg_type, enum fsck_msg_id msg_id,
-				const char *message);
-int fsck_objects_error_cb_print_missing_gitmodules(struct fsck_options *o,
-						   void *fsck_report,
-						   enum fsck_msg_type msg_type,
-						   enum fsck_msg_id msg_id,
-						   const char *message);
+int fsck_objects_error_function(struct fsck_options * o, void * fsck_report, enum fsck_msg_type msg_type, enum fsck_msg_id msg_id, const char * message);
+int fsck_objects_error_cb_print_missing_gitmodules
+(
+    struct fsck_options * o, void * fsck_report, enum fsck_msg_type msg_type, enum fsck_msg_id msg_id, const char * message
+);
 
-int fsck_refs_error_function(struct fsck_options *options,
-			     void *fsck_report,
-			     enum fsck_msg_type msg_type,
-			     enum fsck_msg_id msg_id,
-			     const char *message);
+int fsck_refs_error_function
+(
+    struct fsck_options * options, void * fsck_report, enum fsck_msg_type msg_type, enum fsck_msg_id msg_id, const char * message
+);
 
-struct fsck_object_report {
-	const struct object_id *oid;
-	enum object_type object_type;
-};
+struct fsck_object_report { const struct object_id * oid; enum object_type object_type; };
 
-struct fsck_ref_report {
-	const char *path;
-};
+struct fsck_ref_report { const char * path; };
 
 struct repository;
 
-struct fsck_options {
-	struct repository *repo;
-	fsck_walk_func walk;
-	fsck_error error_func;
-	unsigned strict;
-	unsigned verbose;
-	enum fsck_msg_type *msg_type;
-	struct oidset skip_oids;
-	struct oidset gitmodules_found;
-	struct oidset gitmodules_done;
-	struct oidset gitattributes_found;
-	struct oidset gitattributes_done;
-	kh_oid_map_t *object_names;
+struct fsck_options
+{
+    struct repository * repo;
+    fsck_walk_func walk;
+    fsck_error error_func;
+    unsigned strict;
+    unsigned verbose;
+    enum fsck_msg_type * msg_type;
+    struct oidset skip_oids;
+    struct oidset gitmodules_found;
+    struct oidset gitmodules_done;
+    struct oidset gitattributes_found;
+    struct oidset gitattributes_done;
+    kh_oid_map_t * object_names;
 };
 
 /* descend in all linked child objects
@@ -189,72 +168,67 @@ struct fsck_options {
  *    <0	return value of the callback, which lead to an abort
  *    >0	return value of the first signaled error >0 (in the case of no other errors)
  *    0		everything OK
- */
-int fsck_walk(struct object *obj, void *data, struct fsck_options *options);
+ */ int fsck_walk
+(
+    struct object * obj, void * data, struct fsck_options * options
+);
 
 /*
  * Blob objects my pass a NULL data pointer, which indicates they are too large
  * to fit in memory. All other types must pass a real buffer.
- */
-int fsck_object(struct object *obj, void *data, unsigned long size,
-	struct fsck_options *options);
+ */ int fsck_object
+(
+    struct object * obj, void * data, unsigned long size, struct fsck_options * options
+);
 
 /*
  * Same as fsck_object(), but for when the caller doesn't have an object
  * struct.
- */
-int fsck_buffer(const struct object_id *oid, enum object_type,
-		const void *data, unsigned long size,
-		struct fsck_options *options);
+ */ int fsck_buffer
+(
+    const struct object_id * oid, enum object_type, const void * data, unsigned long size, struct fsck_options * options
+);
 
 /*
  * fsck a tag, and pass info about it back to the caller. This is
  * exposed fsck_object() internals for git-mktag(1).
- */
-int fsck_tag_standalone(const struct object_id *oid, const char *buffer,
-			unsigned long size, struct fsck_options *options,
-			struct object_id *tagged_oid,
-			int *tag_type);
+ */ int fsck_tag_standalone
+(
+    const struct object_id * oid, const char * buffer, unsigned long size, struct fsck_options * options, struct object_id * tagged_oid, int * tag_type
+);
 
 /*
  * Some fsck checks are context-dependent, and may end up queued; run this
  * after completing all fsck_object() calls in order to resolve any remaining
  * checks.
- */
-int fsck_finish(struct fsck_options *options);
+ */ int fsck_finish
+(
+    struct fsck_options * options
+);
 
 /*
  * Check whether there are any checks that have been queued up and that still
  * need to be run. Returns `false` iff `fsck_finish()` wouldn't perform any
  * actions, `true` otherwise.
- */
-bool fsck_has_queued_checks(struct fsck_options *options);
+ */ bool fsck_has_queued_checks
+(
+    struct fsck_options * options
+);
 
-enum fsck_options_type {
-	FSCK_OPTIONS_DEFAULT,
-	FSCK_OPTIONS_STRICT,
-	FSCK_OPTIONS_MISSING_GITMODULES,
-	FSCK_OPTIONS_REFS,
-};
+enum fsck_options_type { FSCK_OPTIONS_DEFAULT, FSCK_OPTIONS_STRICT, FSCK_OPTIONS_MISSING_GITMODULES, FSCK_OPTIONS_REFS, };
 
-void fsck_options_init(struct fsck_options *options,
-		       struct repository *repo,
-		       enum fsck_options_type type);
+void fsck_options_init(struct fsck_options * options, struct repository * repo, enum fsck_options_type type);
 
 /*
  * Clear the fsck_options struct, freeing any allocated memory.
- */
-void fsck_options_clear(struct fsck_options *options);
+ */ void fsck_options_clear(struct fsck_options * options);
 
 /*
  * Report an error or warning for refs.
- */
-__attribute__((format (printf, 4, 5)))
-int fsck_report_ref(struct fsck_options *options,
-		    struct fsck_ref_report *report,
-		    enum fsck_msg_id msg_id,
-		    const char *fmt, ...);
-
+ */ __attribute__((format(printf, 4, 5))) int fsck_report_ref
+(
+    struct fsck_options * options, struct fsck_ref_report * report, enum fsck_msg_id msg_id, const char * fmt, ... 
+);
 
 /*
  * Subsystem for storing human-readable names for each object.
@@ -270,23 +244,20 @@ int fsck_report_ref(struct fsck_options *options,
  * with the oid combined with the name (if any). Note that the return value
  * points to a rotating array of static buffers, and may be invalidated by a
  * subsequent call.
- */
-void fsck_enable_object_names(struct fsck_options *options);
-const char *fsck_get_object_name(struct fsck_options *options,
-				 const struct object_id *oid);
-__attribute__((format (printf,3,4)))
-void fsck_put_object_name(struct fsck_options *options,
-			  const struct object_id *oid,
-			  const char *fmt, ...);
-const char *fsck_describe_object(struct fsck_options *options,
-				 const struct object_id *oid);
+ */ void fsck_enable_object_names
+(
+    struct fsck_options * options
+);
+const char * fsck_get_object_name(struct fsck_options * options, const struct object_id * oid);
+__attribute__((format(printf, 3, 4))) void fsck_put_object_name(struct fsck_options * options, const struct object_id * oid, const char * fmt, ...);
+const char * fsck_describe_object(struct fsck_options * options, const struct object_id * oid);
 
 struct key_value_info;
 /*
  * repo_config() callback for use by fsck-y tools that want to support
  * fsck.<msg> fsck.skipList etc.
- */
-int git_fsck_config(const char *var, const char *value,
-		    const struct config_context *ctx, void *cb);
-
+ */ int git_fsck_config
+(
+    const char * var, const char * value, const struct config_context * ctx, void * cb
+);
 #endif

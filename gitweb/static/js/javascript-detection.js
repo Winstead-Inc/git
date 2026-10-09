@@ -5,18 +5,11 @@
 /**
  * @fileOverview Detect if JavaScript is enabled, and pass it to server-side
  * @license GPLv2 or later
- */
-
-
-/* ============================================================ */
-/* Manipulating links */
-
-/**
+ */ /* ============================================================ */ /* Manipulating links */ /**
  * used to check if link has 'js' query parameter already (at end),
  * and other reasons to not add 'js=1' param at the end of link
  * @constant
- */
-var jsExceptionsRe = /[;?]js=[01](#.*)?$/;
+ */ var jsExceptionsRe = /[;?]js=[01](#.*)?$/;
 
 /**
  * Add '?js=1' or ';js=1' to the end of every link in the document
@@ -28,16 +21,17 @@ var jsExceptionsRe = /[;?]js=[01](#.*)?$/;
  * To be used as `window.onload` handler
  *
  * @globals jsExceptionsRe
- */
-function fixLinks() {
-	var allLinks = document.getElementsByTagName("a") || document.links;
-	for (var i = 0, len = allLinks.length; i < len; i++) {
-		var link = allLinks[i];
-		if (!jsExceptionsRe.test(link)) {
-			link.href = link.href.replace(/(#|$)/,
-				(link.href.indexOf('?') === -1 ? '?' : ';') + 'js=1$1');
-		}
-	}
+ */ function fixLinks()
+{
+    var allLinks = document.getElementsByTagName("a") || document.links;
+    for (var i = 0, len = allLinks.length; i < len; i ++)
+    {
+        var link = allLinks[i];
+        if ( ! jsExceptionsRe.test(link))
+        {
+            link.href = link.href.replace( / ( # | $) / , (link.href.indexOf('?') === - 1?'?': ';') + 'js=1$1');
+        }
+    }
 }
 
 /* end of javascript-detection.js */

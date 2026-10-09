@@ -1,5 +1,4 @@
 #define USE_THE_REPOSITORY_VARIABLE
-
 #include "git-compat-util.h"
 #include "common-init.h"
 #include "exec-cmd.h"
@@ -23,61 +22,53 @@
  *
  * Restore the way SIGPIPE is handled to default, which is what we
  * expect.
- */
-static void restore_sigpipe_to_default(void)
-{
-	sigset_t unblock;
-
-	sigemptyset(&unblock);
-	sigaddset(&unblock, SIGPIPE);
-	sigprocmask(SIG_UNBLOCK, &unblock, NULL);
-	signal(SIGPIPE, SIG_DFL);
-}
+ */ static void restore_sigpipe_to_default
+(
+    void
+)
+{ sigset_t unblock; sigemptyset( & unblock); sigaddset( & unblock, SIGPIPE); sigprocmask(SIG_UNBLOCK, & unblock, NULL); signal(SIGPIPE, SIG_DFL); }
 
 static void setup_environment(void)
 {
-	char *git_replace_ref_base;
-	const char *replace_ref_base;
+    char * git_replace_ref_base;
+    const char * replace_ref_base;
 
-	if (getenv(NO_REPLACE_OBJECTS_ENVIRONMENT))
-		disable_replace_refs();
-	replace_ref_base = getenv(GIT_REPLACE_REF_BASE_ENVIRONMENT);
-	git_replace_ref_base = xstrdup(replace_ref_base ? replace_ref_base
-							  : "refs/replace/");
-	update_ref_namespace(NAMESPACE_REPLACE, git_replace_ref_base);
+    if (getenv(NO_REPLACE_OBJECTS_ENVIRONMENT)) disable_replace_refs();
+    replace_ref_base = getenv(GIT_REPLACE_REF_BASE_ENVIRONMENT);
+    git_replace_ref_base = xstrdup(replace_ref_base? replace_ref_base: "refs/replace/");
+    update_ref_namespace(NAMESPACE_REPLACE, git_replace_ref_base);
 
-	if (git_env_bool(NO_LAZY_FETCH_ENVIRONMENT, 0))
-		the_repository->fetch_if_missing = 0;
+    if (git_env_bool(NO_LAZY_FETCH_ENVIRONMENT, 0)) the_repository->fetch_if_missing = 0;
 }
 
-void init_git(const char **argv)
+void init_git(const char ** argv)
 {
-	struct strbuf tmp = STRBUF_INIT;
+    struct strbuf tmp = STRBUF_INIT;
 
-	trace2_initialize_clock();
+    trace2_initialize_clock();
 
-	/*
+    /*
 	 * Always open file descriptors 0/1/2 to avoid clobbering files
 	 * in die().  It also avoids messing up when the pipes are dup'ed
 	 * onto stdin/stdout/stderr in the child processes we spawn.
-	 */
-	sanitize_stdfds();
-	restore_sigpipe_to_default();
+	 */ sanitize_stdfds
+    (
+    );
+    restore_sigpipe_to_default();
 
-	git_resolve_executable_dir(argv[0]);
+    git_resolve_executable_dir(argv[0]);
 
-	setlocale(LC_CTYPE, "");
-	git_setup_gettext();
+    setlocale(LC_CTYPE, "");
+    git_setup_gettext();
 
-	initialize_repository(the_repository);
-	setup_environment();
+    initialize_repository(the_repository);
+    setup_environment();
 
-	attr_start();
+    attr_start();
 
-	trace2_initialize();
-	trace2_cmd_start(argv);
-	trace2_collect_process_info(TRACE2_PROCESS_INFO_STARTUP);
+    trace2_initialize();
+    trace2_cmd_start(argv);
+    trace2_collect_process_info(TRACE2_PROCESS_INFO_STARTUP);
 
-	if (!strbuf_getcwd(&tmp))
-		tmp_original_cwd = strbuf_detach(&tmp, NULL);
+    if ( ! strbuf_getcwd( & tmp)) tmp_original_cwd = strbuf_detach( & tmp, NULL);
 }

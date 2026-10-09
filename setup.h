@@ -1,20 +1,21 @@
 #ifndef SETUP_H
 #define SETUP_H
-
 #include "refs.h"
 #include "string-list.h"
 
-int is_inside_git_dir(struct repository *repo);
-int is_inside_work_tree(struct repository *repo);
-int get_common_dir_noenv(struct strbuf *sb, const char *gitdir);
-int get_common_dir(struct strbuf *sb, const char *gitdir);
+int is_inside_git_dir(struct repository * repo);
+int is_inside_work_tree(struct repository * repo);
+int get_common_dir_noenv(struct strbuf * sb, const char * gitdir);
+int get_common_dir(struct strbuf * sb, const char * gitdir);
 
 /*
  * Return true if the given path is a git directory; note that this _just_
  * looks at the directory itself. If you want to know whether "foo/.git"
  * is a repository, you must feed that path, not just "foo".
- */
-int is_git_directory(const char *path);
+ */ int is_git_directory
+(
+    const char * path
+);
 
 /*
  * Return 1 if the given path is the root of a git repository or
@@ -25,9 +26,10 @@ int is_git_directory(const char *path);
  * If we run into read errors, we err on the side of saying "yes, it is",
  * as we usually consider sub-repos precious, and would prefer to err on the
  * side of not disrupting or deleting them.
- */
-int is_nonbare_repository_dir(struct strbuf *path);
-
+ */ int is_nonbare_repository_dir
+(
+    struct strbuf * path
+);
 #define READ_GITFILE_ERR_STAT_FAILED 1
 #define READ_GITFILE_ERR_NOT_A_FILE 2
 #define READ_GITFILE_ERR_OPEN_FAILED 3
@@ -38,11 +40,11 @@ int is_nonbare_repository_dir(struct strbuf *path);
 #define READ_GITFILE_ERR_TOO_LARGE 8
 #define READ_GITFILE_ERR_MISSING 9
 #define READ_GITFILE_ERR_IS_A_DIR 10
-void read_gitfile_error_die(int error_code, const char *path);
-const char *read_gitfile_gently(const char *path, int *return_error_code);
-int read_gitfile_raw(struct strbuf *contents, const char *path);
+void read_gitfile_error_die(int error_code, const char * path);
+const char * read_gitfile_gently(const char * path, int * return_error_code);
+int read_gitfile_raw(struct strbuf * contents, const char * path);
 #define read_gitfile(path) read_gitfile_gently((path), NULL)
-const char *resolve_gitdir_gently(const char *suspect, int *return_error_code);
+const char * resolve_gitdir_gently(const char * suspect, int * return_error_code);
 #define resolve_gitdir(path) resolve_gitdir_gently((path), NULL)
 
 /*
@@ -53,33 +55,23 @@ const char *resolve_gitdir_gently(const char *suspect, int *return_error_code);
  * Exemptions for known-safe repositories can be added via `safe.directory`
  * config settings; for non-bare repositories, their worktree needs to be
  * added, for bare ones their git directory.
- */
-void die_upon_dubious_ownership(const char *gitfile, const char *worktree,
-				const char *gitdir);
+ */ void die_upon_dubious_ownership
+(
+    const char * gitfile, const char * worktree, const char * gitdir
+);
 
-void setup_work_tree(struct repository *repo);
+void setup_work_tree(struct repository * repo);
 
 /*
  * discover_git_directory_reason() is similar to discover_git_directory(),
  * except it returns an enum value instead. It is important to note that
  * a zero-valued return here is actually GIT_DIR_NONE, which is different
  * from discover_git_directory.
- */
-enum discovery_result {
-	GIT_DIR_EXPLICIT = 1,
-	GIT_DIR_DISCOVERED = 2,
-	GIT_DIR_BARE = 3,
-	/* these are errors */
-	GIT_DIR_HIT_CEILING = -1,
-	GIT_DIR_HIT_MOUNT_POINT = -2,
-	GIT_DIR_INVALID_GITFILE = -3,
-	GIT_DIR_INVALID_OWNERSHIP = -4,
-	GIT_DIR_DISALLOWED_BARE = -5,
-	GIT_DIR_INVALID_FORMAT = -6,
-	GIT_DIR_CWD_FAILURE = -7,
+ */ enum discovery_result
+{
+    GIT_DIR_EXPLICIT = 1, GIT_DIR_DISCOVERED = 2, GIT_DIR_BARE = 3, /* these are errors */ GIT_DIR_HIT_CEILING = - 1, GIT_DIR_HIT_MOUNT_POINT = - 2, GIT_DIR_INVALID_GITFILE = - 3, GIT_DIR_INVALID_OWNERSHIP = - 4, GIT_DIR_DISALLOWED_BARE = - 5, GIT_DIR_INVALID_FORMAT = - 6, GIT_DIR_CWD_FAILURE = - 7, 
 };
-enum discovery_result discover_git_directory_reason(struct strbuf *commondir,
-						    struct strbuf *gitdir);
+enum discovery_result discover_git_directory_reason(struct strbuf * commondir, struct strbuf * gitdir);
 
 /*
  * Find the commondir and gitdir of the repository that contains the current
@@ -88,28 +80,26 @@ enum discovery_result discover_git_directory_reason(struct strbuf *commondir,
  * gitdir does not correspond to a worktree, then 'commondir' and 'gitdir' will
  * both have the same result appended to the buffer.  The return value is
  * either 0 upon success and -1 if no repository was found.
- */
-static inline int discover_git_directory(struct strbuf *commondir,
-					 struct strbuf *gitdir)
-{
-	if (discover_git_directory_reason(commondir, gitdir) <= 0)
-		return -1;
-	return 0;
-}
+ */ static inline int discover_git_directory
+(
+    struct strbuf * commondir, struct strbuf * gitdir
+)
+{ if (discover_git_directory_reason(commondir, gitdir) <= 0) return - 1; return 0; }
 
-/* Flags that can be passed to `enter_repo()`. */
-enum {
-	/*
+/* Flags that can be passed to `enter_repo()`. */ enum 
+{
+    /*
 	 * Callers that require exact paths (as opposed to allowing known
 	 * suffixes like ".git", ".git/.git" to be omitted) can set this bit.
-	 */
-	ENTER_REPO_STRICT = (1<<0),
+	 */ ENTER_REPO_STRICT = 
+    (
+        1 << 0
+    ),
 
-	/*
+    /*
 	 * Callers that are willing to run without ownership check can set this
 	 * bit.
-	 */
-	ENTER_REPO_ANY_OWNER_OK = (1<<1),
+	 */ ENTER_REPO_ANY_OWNER_OK = (1 << 1),
 };
 
 /*
@@ -132,21 +122,20 @@ enum {
  * before ~user is expanded), avoiding getcwd() resolving symbolic
  * links.  User relative paths are also returned as they are given,
  * except DWIM suffixing.
- */
-const char *enter_repo(struct repository *repo, const char *path, unsigned flags);
+ */ const char * enter_repo
+(
+    struct repository * repo, const char * path, unsigned flags
+);
 
-const char *setup_git_directory_gently(struct repository *repo, int *);
-const char *setup_git_directory(struct repository *repo);
-char *prefix_path(struct repository *repo, const char *prefix, int len, const char *path);
-char *prefix_path_gently(struct repository *repo, const char *prefix, int len, int *remaining, const char *path);
+const char * setup_git_directory_gently(struct repository * repo, int *);
+const char * setup_git_directory(struct repository * repo);
+char * prefix_path(struct repository * repo, const char * prefix, int len, const char * path);
+char * prefix_path_gently(struct repository * repo, const char * prefix, int len, int * remaining, const char * path);
 
-int check_filename(const char *prefix, const char *name);
-void verify_filename(struct repository *repo,
-		     const char *prefix,
-		     const char *name,
-		     int diagnose_misspelt_rev);
-void verify_non_filename(struct repository *repo, const char *prefix, const char *name);
-int path_inside_repo(struct repository *repo, const char *prefix, const char *path);
+int check_filename(const char * prefix, const char * name);
+void verify_filename(struct repository * repo, const char * prefix, const char * name, int diagnose_misspelt_rev);
+void verify_non_filename(struct repository * repo, const char * prefix, const char * name);
+int path_inside_repo(struct repository * repo, const char * prefix, const char * path);
 
 void sanitize_stdfds(void);
 
@@ -163,8 +152,10 @@ void sanitize_stdfds(void);
  *   - The child process is made a session leader via setsid(3p).
  *   - All tempfiles owned by the parent process are reassigned to the
  *     daemonized child process.
- */
-int daemonize(void);
+ */ int daemonize
+(
+    void
+);
 
 /*
  * GIT_REPO_VERSION is the version we write by default. The
@@ -177,23 +168,23 @@ int daemonize(void);
 /*
  * You _have_ to initialize a `struct repository_format` using
  * `= REPOSITORY_FORMAT_INIT` before calling `read_repository_format()`.
- */
-struct repository_format {
-	int version;
-	int precious_objects;
-	char *partial_clone; /* value of extensions.partialclone */
-	int worktree_config;
-	int relative_worktrees;
-	int submodule_path_cfg;
-	int is_bare;
-	int hash_algo;
-	int compat_hash_algo;
-	enum ref_storage_format ref_storage_format;
-	char *ref_storage_payload;
-	int sparse_index;
-	char *work_tree;
-	struct string_list unknown_extensions;
-	struct string_list v1_only_extensions;
+ */ struct repository_format
+{
+    int version;
+    int precious_objects;
+    char * partial_clone;
+/* value of extensions.partialclone */ int worktree_config;
+    int relative_worktrees;
+    int submodule_path_cfg;
+    int is_bare;
+    int hash_algo;
+    int compat_hash_algo;
+    enum ref_storage_format ref_storage_format;
+    char * ref_storage_payload;
+    int sparse_index;
+    char * work_tree;
+    struct string_list unknown_extensions;
+    struct string_list v1_only_extensions;
 };
 
 /*
@@ -218,30 +209,38 @@ struct repository_format {
  * and all other fields in the struct are set to the default configuration
  * (REPOSITORY_FORMAT_INIT). Always initialize the struct using
  * REPOSITORY_FORMAT_INIT before calling this function.
- */
-int read_repository_format(struct repository_format *format, const char *path);
+ */ int read_repository_format
+(
+    struct repository_format * format, const char * path
+);
 
 /*
  * Free the memory held onto by `format`, but not the struct itself.
  * (No need to use this after `read_repository_format()` fails.)
- */
-void clear_repository_format(struct repository_format *format);
+ */ void clear_repository_format
+(
+    struct repository_format * format
+);
 
 /*
  * Verify that the repository described by repository_format is something we
  * can read. If it is, return 0. Otherwise, return -1, and "err" will describe
  * any errors encountered.
- */
-int verify_repository_format(const struct repository_format *format,
-			     struct strbuf *err);
+ */ int verify_repository_format
+(
+    const struct repository_format * format, struct strbuf * err
+);
 
-enum apply_repository_format_flags {
-	/*
+enum apply_repository_format_flags
+{
+    /*
 	 * Honor environment variables when applying the repository format to
 	 * the repository. For now, this only covers environment variables that
 	 * relate to the object database.
-	 */
-	APPLY_REPOSITORY_FORMAT_HONOR_ENV = (1 << 0),
+	 */ APPLY_REPOSITORY_FORMAT_HONOR_ENV = 
+    (
+        1 << 0
+    ),
 };
 
 /*
@@ -249,13 +248,12 @@ enum apply_repository_format_flags {
  * required for normal operation. Returns 0 on success, a negative error code
  * when the format is not valid as determined by
  * `verify_repository_format()`.
- */
-int apply_repository_format(struct repository *repo,
-			    const struct repository_format *format,
-			    enum apply_repository_format_flags flags,
-			    struct strbuf *err);
+ */ int apply_repository_format
+(
+    struct repository * repo, const struct repository_format * format, enum apply_repository_format_flags flags, struct strbuf * err
+);
 
-const char *get_template_dir(const char *option_template);
+const char * get_template_dir(const char * option_template);
 
 /*
  * Create the repository by creating the necessary directory structures,
@@ -266,37 +264,32 @@ const char *get_template_dir(const char *option_template);
  * to `1` in case the repo was reinitialized and `0` if it didn't exist yet.
  *
  * Note that this function does not create the reference and object databases.
- */
-void create_repository(struct repository *repo,
-		       const char *git_dir,
-		       const char *real_git_dir,
-		       const char *worktree,
-		       const char *template_dir,
-		       int hash_algo,
-		       const char *ref_storage_format_uri,
-		       int init_shared_repository,
-		       int *reinit_ok);
+ */ void create_repository
+(
+    struct repository * repo, const char * git_dir, const char * real_git_dir, const char * worktree, const char * template_dir, int hash_algo, const char * ref_storage_format_uri, int init_shared_repository, int * reinit_ok
+);
 
-void initialize_repository_version(struct repository *repo,
-				   int hash_algo,
-				   enum ref_storage_format ref_storage_format,
-				   int reinit);
+void initialize_repository_version(struct repository * repo, int hash_algo, enum ref_storage_format ref_storage_format, int reinit);
 
 /*
  * Create the reference database for the repository. The repository and its ref
  * storage format must have already been configured properly before calling
  * this function. When set, `initial_branch` overrides the default branch that
  * HEAD will point to.
- */
-void create_reference_database(struct repository *repo, const char *initial_branch, int quiet);
+ */ void create_reference_database
+(
+    struct repository * repo, const char * initial_branch, int quiet
+);
 
 /*
  * Create the object database for the repository. The repository must have
  * already been configured properly before calling this function. When set,
  * `alternates` is the list of alternates that should be written into the
  * object database.
- */
-void create_object_database(struct repository *repo, const struct strvec *alternates);
+ */ void create_object_database
+(
+    struct repository * repo, const struct strvec * alternates
+);
 
 /*
  * NOTE NOTE NOTE!!
@@ -305,27 +298,22 @@ void create_object_database(struct repository *repo, const struct strvec *altern
  * not be changed. Old repositories have core.sharedrepository written in
  * numeric format, and therefore these values are preserved for compatibility
  * reasons.
- */
-enum sharedrepo {
-	PERM_UMASK          = 0,
-	OLD_PERM_GROUP      = 1,
-	OLD_PERM_EVERYBODY  = 2,
-	PERM_GROUP          = 0660,
-	PERM_EVERYBODY      = 0664
+ */ enum sharedrepo
+{
+    PERM_UMASK = 0, OLD_PERM_GROUP = 1, OLD_PERM_EVERYBODY = 2, PERM_GROUP = 0660, PERM_EVERYBODY = 0664
 };
-int git_config_perm(const char *var, const char *value);
+int git_config_perm(const char * var , const char * value);
 
-struct startup_info {
-	/*
+struct startup_info
+{
+    /*
 	 * Whether the user is asking us to treat the repository as bare via
 	 * `git --bare`, even if it's not.
-	 */
-	bool force_bare_repository;
+	 */ bool force_bare_repository;
 
-	int have_repository;
-	const char *original_cwd;
+    int have_repository;
+    const char * original_cwd;
 };
-extern struct startup_info *startup_info;
-extern const char *tmp_original_cwd;
-
+extern struct startup_info * startup_info;
+extern const char * tmp_original_cwd;
 #endif /* SETUP_H */

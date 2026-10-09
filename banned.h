@@ -7,9 +7,7 @@
  * complicate audits). Including this header turns them into compile-time
  * errors.
  */
-
 #define BANNED(func) sorry_##func##_is_a_banned_function
-
 #undef strcpy
 #define strcpy(x,y) BANNED(strcpy)
 #undef strcat
@@ -22,12 +20,10 @@
 #define strtok(x,y) BANNED(strtok)
 #undef strtok_r
 #define strtok_r(x,y,z) BANNED(strtok_r)
-
 #undef sprintf
 #undef vsprintf
 #define sprintf(...) BANNED(sprintf)
 #define vsprintf(...) BANNED(vsprintf)
-
 #undef gmtime
 #define gmtime(t) BANNED(gmtime)
 #undef localtime
@@ -40,8 +36,6 @@
 #define asctime(t) BANNED(asctime)
 #undef asctime_r
 #define asctime_r(t, buf) BANNED(asctime_r)
-
 #undef mktemp
 #define mktemp(x) BANNED(mktemp)
-
 #endif /* BANNED_H */

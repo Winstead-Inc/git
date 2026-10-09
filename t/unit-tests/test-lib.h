@@ -1,6 +1,5 @@
 #ifndef TEST_LIB_H
 #define TEST_LIB_H
-
 #include "git-compat-util.h"
 
 /*
@@ -35,27 +34,25 @@
  * Print a test plan, should be called before any tests. If the number
  * of tests is not known in advance test_done() will automatically
  * print a plan at the end of the test program.
- */
-void test_plan(int count);
+ */ void test_plan
+(
+    int count
+);
 
 /*
  * test_done() must be called at the end of main(). It will print the
  * plan if plan() was not called at the beginning of the test program
  * and returns the exit code for the test program.
- */
-int test_done(void);
+ */ int test_done
+(
+    void
+);
 
-/* Skip the current test. */
-__attribute__((format (printf, 1, 2)))
-void test_skip(const char *format, ...);
+/* Skip the current test. */ __attribute__((format(printf, 1, 2))) void test_skip(const char * format, ...);
 
-/* Skip all remaining tests. */
-__attribute__((format (printf, 1, 2)))
-void test_skip_all(const char *format, ...);
+/* Skip all remaining tests. */ __attribute__((format(printf, 1, 2))) void test_skip_all(const char * format, ...);
 
-/* Print a diagnostic message to stdout. */
-__attribute__((format (printf, 1, 2)))
-void test_msg(const char *format, ...);
+/* Print a diagnostic message to stdout. */ __attribute__((format(printf, 1, 2))) void test_msg(const char * format, ...);
 
 /*
  * Test checks are built around test_assert(). checks return 1 on
@@ -81,8 +78,10 @@ void test_msg(const char *format, ...);
  *
  *  #define check_oid(a, b) \
  *	    check_oid_loc(TEST_LOCATION(), "oideq("#a", "#b")", a, b)
- */
-int test_assert(const char *location, const char *check, int ok);
+ */ int test_assert
+(
+    const char * location, const char * check, int ok
+);
 
 /* Helper macro to pass the location to checks */
 #define TEST_LOCATION() TEST__MAKE_LOCATION(__LINE__)
@@ -90,7 +89,7 @@ int test_assert(const char *location, const char *check, int ok);
 /* Check a boolean condition. */
 #define check(x)				\
 	check_bool_loc(TEST_LOCATION(), #x, x)
-int check_bool_loc(const char *loc, const char *check, int ok);
+int check_bool_loc(const char * loc, const char * check, int ok);
 
 /*
  * Compare the equality of two pointers of same type. Prints a message
@@ -102,8 +101,7 @@ int check_bool_loc(const char *loc, const char *check, int ok);
 	 check_pointer_eq_loc(TEST_LOCATION(), #a" == "#b,		\
 			      test__tmp[0].p == test__tmp[1].p,		\
 			      test__tmp[0].p, test__tmp[1].p))
-int check_pointer_eq_loc(const char *loc, const char *check, int ok,
-			 const void *a, const void *b);
+int check_pointer_eq_loc(const char * loc, const char * check, int ok, const void * a, const void * b);
 
 /*
  * Compare two integers. Prints a message with the two values if the
@@ -114,8 +112,7 @@ int check_pointer_eq_loc(const char *loc, const char *check, int ok,
 	 check_int_loc(TEST_LOCATION(), #a" "#op" "#b,			\
 		       test__tmp[0].i op test__tmp[1].i,		\
 		       test__tmp[0].i, test__tmp[1].i))
-int check_int_loc(const char *loc, const char *check, int ok,
-		  intmax_t a, intmax_t b);
+int check_int_loc(const char * loc, const char * check, int ok, intmax_t a, intmax_t b);
 
 /*
  * Compare two unsigned integers. Prints a message with the two values
@@ -126,8 +123,7 @@ int check_int_loc(const char *loc, const char *check, int ok,
 	 check_uint_loc(TEST_LOCATION(), #a" "#op" "#b,			\
 			test__tmp[0].u op test__tmp[1].u,		\
 			test__tmp[0].u, test__tmp[1].u))
-int check_uint_loc(const char *loc, const char *check, int ok,
-		   uintmax_t a, uintmax_t b);
+int check_uint_loc(const char * loc, const char * check, int ok, uintmax_t a, uintmax_t b);
 
 /*
  * Compare two chars. Prints a message with the two values if the
@@ -138,14 +134,12 @@ int check_uint_loc(const char *loc, const char *check, int ok,
 	 check_char_loc(TEST_LOCATION(), #a" "#op" "#b,			\
 			test__tmp[0].c op test__tmp[1].c,		\
 			test__tmp[0].c, test__tmp[1].c))
-int check_char_loc(const char *loc, const char *check, int ok,
-		   char a, char b);
+int check_char_loc(const char * loc, const char * check, int ok, char a, char b);
 
 /* Check whether two strings are equal. */
 #define check_str(a, b)							\
 	check_str_loc(TEST_LOCATION(), "!strcmp("#a", "#b")", a, b)
-int check_str_loc(const char *loc, const char *check,
-		  const char *a, const char *b);
+int check_str_loc(const char * loc, const char * check, const char * a, const char * b);
 
 /*
  * Wrap a check that is known to fail. If the check succeeds then the
@@ -158,26 +152,17 @@ int check_str_loc(const char *loc, const char *check,
 	(test__todo_begin(), test__todo_end(TEST_LOCATION(), #check, check))
 
 /* Private helpers */
-
 #define TEST__STR(x) #x
 #define TEST__MAKE_LOCATION(line) __FILE__ ":" TEST__STR(line)
 
-union test__tmp {
-	intmax_t i;
-	uintmax_t u;
-	char c;
-	const void *p;
-};
+union test__tmp { intmax_t i; uintmax_t u; char c; const void * p; };
 
 extern union test__tmp test__tmp[2];
 
-__attribute__((format (printf, 2, 3)))
-void test__run_describe(const char *, const char *, ...);
+__attribute__((format(printf, 2, 3))) void test__run_describe(const char * , const char * , ...);
 
 int test__run_begin(void);
-__attribute__((format (printf, 3, 4)))
-int test__run_end(int, const char *, const char *, ...);
+__attribute__((format(printf, 3, 4))) int test__run_end(int , const char * , const char * , ...);
 void test__todo_begin(void);
-int test__todo_end(const char *, const char *, int);
-
+int test__todo_end(const char * , const char * , int);
 #endif /* TEST_LIB_H */

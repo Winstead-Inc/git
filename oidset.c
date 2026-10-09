@@ -3,108 +3,84 @@
 #include "hex.h"
 #include "strbuf.h"
 
-void oidset_init(struct oidset *set, size_t initial_size)
+void oidset_init(struct oidset * set , size_t initial_size)
 {
-	memset(&set->set, 0, sizeof(set->set));
-	if (initial_size)
-		kh_resize_oid_set(&set->set, initial_size);
+    memset( & set->set , 0, sizeof (set->set));
+    if (initial_size) kh_resize_oid_set( & set->set , initial_size);
 }
 
-int oidset_contains(const struct oidset *set, const struct object_id *oid)
+int oidset_contains(const struct oidset * set , const struct object_id * oid)
 {
-	khiter_t pos = kh_get_oid_set(&set->set, *oid);
-	return pos != kh_end(&set->set);
+    khiter_t pos = kh_get_oid_set( & set->set , * oid);
+    return pos != kh_end( & set->set);
 }
 
-bool oidset_equal(const struct oidset *a, const struct oidset *b)
+bool oidset_equal(const struct oidset * a, const struct oidset * b)
 {
-	struct oidset_iter iter;
-	struct object_id *a_oid;
+    struct oidset_iter iter;
+    struct object_id * a_oid;
 
-	if (oidset_size(a) != oidset_size(b))
-		return false;
+    if (oidset_size(a) != oidset_size(b)) return false;
 
-	oidset_iter_init(a, &iter);
-	while ((a_oid = oidset_iter_next(&iter)))
-		if (!oidset_contains(b, a_oid))
-			return false;
+    oidset_iter_init(a, & iter); while ((a_oid = oidset_iter_next( & iter))) if ( ! oidset_contains(b, a_oid)) return false;
 
-	return true;
+    return true;
 }
 
-int oidset_insert(struct oidset *set, const struct object_id *oid)
+int oidset_insert(struct oidset * set , const struct object_id * oid) { int added; kh_put_oid_set( & set->set , * oid, & added); return ! added; }
+
+void oidset_insert_from_set(struct oidset * dest, struct oidset * src)
 {
-	int added;
-	kh_put_oid_set(&set->set, *oid, &added);
-	return !added;
+    struct oidset_iter iter;
+    struct object_id * src_oid;
+
+    oidset_iter_init(src, & iter); while ((src_oid = oidset_iter_next( & iter))) oidset_insert(dest, src_oid);
 }
 
-void oidset_insert_from_set(struct oidset *dest, struct oidset *src)
+int oidset_remove(struct oidset * set , const struct object_id * oid)
 {
-	struct oidset_iter iter;
-	struct object_id *src_oid;
-
-	oidset_iter_init(src, &iter);
-	while ((src_oid = oidset_iter_next(&iter)))
-		oidset_insert(dest, src_oid);
+    khiter_t pos = kh_get_oid_set( & set->set , * oid);
+    if (pos == kh_end( & set->set)) return 0;
+    kh_del_oid_set( & set->set , pos);
+    return 1;
 }
 
-int oidset_remove(struct oidset *set, const struct object_id *oid)
+void oidset_clear(struct oidset * set) { kh_release_oid_set( & set->set); oidset_init(set , 0); }
+
+void oidset_parse_file(struct oidset * set , const char * path, const struct git_hash_algo * algop)
 {
-	khiter_t pos = kh_get_oid_set(&set->set, *oid);
-	if (pos == kh_end(&set->set))
-		return 0;
-	kh_del_oid_set(&set->set, pos);
-	return 1;
+    oidset_parse_file_carefully(set , path, algop, NULL, NULL);
 }
 
-void oidset_clear(struct oidset *set)
+void oidset_parse_file_carefully(struct oidset * set , const char * path, const struct git_hash_algo * algop, oidset_parse_tweak_fn fn, void * cbdata)
 {
-	kh_release_oid_set(&set->set);
-	oidset_init(set, 0);
-}
+    FILE * fp;
+    struct strbuf sb = STRBUF_INIT;
+    struct object_id oid;
 
-void oidset_parse_file(struct oidset *set, const char *path,
-		       const struct git_hash_algo *algop)
-{
-	oidset_parse_file_carefully(set, path, algop, NULL, NULL);
-}
+    fp = fopen(path, "r");
+    if ( ! fp) die("could not open object name list: %s", path); while ( ! strbuf_getline( & sb, fp))
+    {
+        const char * p;
+        const char * name;
 
-void oidset_parse_file_carefully(struct oidset *set, const char *path,
-				 const struct git_hash_algo *algop,
-				 oidset_parse_tweak_fn fn, void *cbdata)
-{
-	FILE *fp;
-	struct strbuf sb = STRBUF_INIT;
-	struct object_id oid;
-
-	fp = fopen(path, "r");
-	if (!fp)
-		die("could not open object name list: %s", path);
-	while (!strbuf_getline(&sb, fp)) {
-		const char *p;
-		const char *name;
-
-		/*
+        /*
 		 * Allow trailing comments, leading whitespace
 		 * (including before commits), and empty or whitespace
 		 * only lines.
-		 */
-		name = strchr(sb.buf, '#');
-		if (name)
-			strbuf_setlen(&sb, name - sb.buf);
-		strbuf_trim(&sb);
-		if (!sb.len)
-			continue;
+		 */ name = strchr
+        (
+            sb.buf, '#'
+        );
+        if (name) strbuf_setlen( & sb, name - sb.buf);
+        strbuf_trim( & sb);
+        if ( ! sb.len) continue;
 
-		if (parse_oid_hex_algop(sb.buf, &oid, &p, algop) || *p != '\0')
-			die("invalid object name: %s", sb.buf);
-		if (fn && fn(&oid, cbdata))
-			continue;
-		oidset_insert(set, &oid);
-	}
-	if (ferror(fp))
-		die_errno("Could not read '%s'", path);
-	fclose(fp);
-	strbuf_release(&sb);
+        if (parse_oid_hex_algop(sb.buf, & oid, & p, algop) || * p != '\0') die("invalid object name: %s", sb.buf);
+        if (fn && fn( & oid, cbdata)) continue;
+        oidset_insert(set , & oid);
+    }
+    if (ferror(fp)) die_errno("Could not read '%s'", path);
+    fclose(fp);
+    strbuf_release( & sb);
 }

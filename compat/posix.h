@@ -1,6 +1,5 @@
 #ifndef COMPAT_POSIX_H
 #define COMPAT_POSIX_H
-
 #define _FILE_OFFSET_BITS 64
 
 /*
@@ -55,11 +54,10 @@
 #else
 # define UNUSED
 #endif
-
 #if defined(__MINGW32__) || defined(__MINGW64__)
 #define _POSIX_C_SOURCE 1
 #elif defined(__sun__)
- /*
+/*
   * On Solaris, when _XOPEN_EXTENDED is set, its header file
   * forces the programs to be XPG4v2, defeating any _XOPEN_SOURCE
   * setting to say we are XPG5 or XPG6.  Also on Solaris,
@@ -84,7 +82,6 @@
 #define _DEFAULT_SOURCE 1
 #define _NETBSD_SOURCE 1
 #define _SGI_SOURCE 1
-
 #if defined(WIN32) && !defined(__CYGWIN__) /* Both MinGW and MSVC */
 # if !defined(_WIN32_WINNT)
 #  define _WIN32_WINNT 0x0603
@@ -97,7 +94,6 @@
 #include <windows.h>
 #define GIT_WINDOWS_NATIVE
 #endif
-
 #include <unistd.h>
 #include <stdio.h>
 #include <sys/stat.h>
@@ -136,7 +132,6 @@
 #ifdef HAVE_BSD_SYSCTL
 #include <sys/sysctl.h>
 #endif
-
 #if defined(__MINGW32__)
 #include "mingw-posix.h"
 #elif defined(_MSC_VER)
@@ -179,65 +174,53 @@
  * while on IP16 and IP16L32 it is "int" (resp. "short")
  * Size needs to match (or exceed) 'sizeof(void *)'.
  * We can't take "long long" here as not everybody has it.
- */
-typedef long intptr_t;
+ */ typedef long intptr_t;
 typedef unsigned long uintptr_t;
 #endif
 #undef _ALL_SOURCE /* AIX 5.3L defines a struct list with _ALL_SOURCE. */
 #include <grp.h>
 #define _ALL_SOURCE 1
 #endif
-
 #ifdef MKDIR_WO_TRAILING_SLASH
 #define mkdir(a,b) compat_mkdir_wo_trailing_slash((a),(b))
-int compat_mkdir_wo_trailing_slash(const char*, mode_t);
+int compat_mkdir_wo_trailing_slash(const char * , mode_t);
 #endif
-
 #ifdef time
 #undef time
 #endif
-static inline time_t git_time(time_t *tloc)
+static inline time_t git_time(time_t * tloc)
 {
-	struct timeval tv;
+    struct timeval tv;
 
-	/*
+    /*
 	 * Avoid time(NULL), which can disagree with gettimeofday(2)
 	 * and filesystem timestamps.
-	 */
-	gettimeofday(&tv, NULL);
+	 */ gettimeofday( & tv, NULL);
 
-	if (tloc)
-		*tloc = tv.tv_sec;
-	return tv.tv_sec;
+    if (tloc) * tloc = tv.tv_sec;
+    return tv.tv_sec;
 }
 #define time git_time
-
 #ifdef NO_STRUCT_ITIMERVAL
-struct itimerval {
-	struct timeval it_interval;
-	struct timeval it_value;
-};
+struct itimerval { struct timeval it_interval; struct timeval it_value; };
 #endif
-
 #ifdef NO_SETITIMER
-static inline int git_setitimer(int which UNUSED,
-				const struct itimerval *value UNUSED,
-				struct itimerval *newvalue UNUSED) {
-	return 0; /* pretend success */
+static inline int git_setitimer(int which UNUSED, const struct itimerval * value UNUSED, struct itimerval * newvalue UNUSED)
+{
+    return 0;
+/* pretend success */
 }
 #undef setitimer
 #define setitimer(which,value,ovalue) git_setitimer(which,value,ovalue)
 #endif
-
 #ifndef NO_LIBGEN_H
 #include <libgen.h>
 #else
 #define basename gitbasename
-char *gitbasename(char *);
+char * gitbasename(char *);
 #define dirname gitdirname
-char *gitdirname(char *);
+char * gitdirname(char *);
 #endif
-
 #ifndef NO_ICONV
 #include <iconv.h>
 #endif
@@ -248,7 +231,6 @@ char *gitdirname(char *);
 #ifndef NI_MAXHOST
 #define NI_MAXHOST 1025
 #endif
-
 #ifndef NI_MAXSERV
 #define NI_MAXSERV 32
 #endif
@@ -259,7 +241,6 @@ char *gitdirname(char *);
 #ifndef PATH_MAX
 #define PATH_MAX 4096
 #endif
-
 #ifndef NAME_MAX
 #define NAME_MAX 255
 #endif
@@ -270,34 +251,26 @@ typedef uintmax_t timestamp_t;
 #define TIME_MAX UINTMAX_MAX
 #define TIME_MIN 0
 
-int lstat_cache_aware_rmdir(const char *path);
+int lstat_cache_aware_rmdir(const char * path);
 #if !defined(__MINGW32__) && !defined(_MSC_VER)
 #define rmdir lstat_cache_aware_rmdir
 #endif
-
 #if defined(NO_MMAP) || defined(USE_WIN32_MMAP)
-
 #ifndef PROT_READ
 #define PROT_READ 1
 #define PROT_WRITE 2
 #define MAP_PRIVATE 1
 #endif
-
 #define mmap git_mmap
 #define munmap git_munmap
-void *git_mmap(void *start, size_t length, int prot, int flags, int fd, off_t offset);
-int git_munmap(void *start, size_t length);
-
+void * git_mmap(void * start, size_t length, int prot, int flags, int fd, off_t offset);
+int git_munmap(void * start, size_t length);
 #else /* NO_MMAP || USE_WIN32_MMAP */
-
 #include <sys/mman.h>
-
 #endif /* NO_MMAP || USE_WIN32_MMAP */
-
 #ifndef MAP_FAILED
 #define MAP_FAILED ((void *)-1)
 #endif
-
 #ifdef NEEDS_MODE_TRANSLATION
 #undef S_IFMT
 #undef S_IFREG
@@ -319,93 +292,75 @@ int git_munmap(void *start, size_t length);
 #undef stat
 #endif
 #define stat(path, buf) git_stat(path, buf)
-int git_stat(const char *, struct stat *);
+int git_stat(const char * , struct stat *);
 #ifdef fstat
 #undef fstat
 #endif
 #define fstat(fd, buf) git_fstat(fd, buf)
-int git_fstat(int, struct stat *);
+int git_fstat(int , struct stat *);
 #ifdef lstat
 #undef lstat
 #endif
 #define lstat(path, buf) git_lstat(path, buf)
-int git_lstat(const char *, struct stat *);
+int git_lstat(const char * , struct stat *);
 #endif
-
 #ifdef NO_PREAD
 #define pread git_pread
-ssize_t git_pread(int fd, void *buf, size_t count, off_t offset);
+ssize_t git_pread(int fd, void * buf, size_t count, off_t offset);
 #endif
-
 #ifdef NO_WRITEV
 #define writev git_writev
 #define iovec git_iovec
-struct git_iovec {
-	void *iov_base;
-	size_t iov_len;
-};
+struct git_iovec { void * iov_base; size_t iov_len; };
 
-ssize_t git_writev(int fd, const struct iovec *iov, int iovcnt);
+ssize_t git_writev(int fd, const struct iovec * iov, int iovcnt);
 #endif
-
 #ifdef NO_SETENV
 #define setenv gitsetenv
-int gitsetenv(const char *, const char *, int);
+int gitsetenv(const char * , const char * , int);
 #endif
-
 #ifdef NO_MKDTEMP
 #define mkdtemp git_mkdtemp
 #endif
-
 #ifdef NO_UNSETENV
 #define unsetenv gitunsetenv
 int gitunsetenv(const char *);
 #endif
-
 #ifdef NO_STRCASESTR
 #define strcasestr gitstrcasestr
-char *gitstrcasestr(const char *haystack, const char *needle);
+char * gitstrcasestr(const char * haystack, const char * needle);
 #endif
-
 #ifdef NO_STRLCPY
 #define strlcpy gitstrlcpy
-size_t gitstrlcpy(char *, const char *, size_t);
+size_t gitstrlcpy(char * , const char * , size_t);
 #endif
-
 #ifdef NO_STRTOUMAX
 #define strtoumax gitstrtoumax
-uintmax_t gitstrtoumax(const char *, char **, int);
+uintmax_t gitstrtoumax(const char * , char ** , int);
 #define strtoimax gitstrtoimax
-intmax_t gitstrtoimax(const char *, char **, int);
+intmax_t gitstrtoimax(const char * , char ** , int);
 #endif
-
 #ifdef NO_HSTRERROR
 #define hstrerror githstrerror
-const char *githstrerror(int herror);
+const char * githstrerror(int herror);
 #endif
-
 #ifdef NO_MEMMEM
 #define memmem gitmemmem
-void *gitmemmem(const void *haystack, size_t haystacklen,
-		const void *needle, size_t needlelen);
+void * gitmemmem(const void * haystack, size_t haystacklen, const void * needle, size_t needlelen);
 #endif
-
 #ifdef OVERRIDE_STRDUP
 #ifdef strdup
 #undef strdup
 #endif
 #define strdup gitstrdup
-char *gitstrdup(const char *s);
+char * gitstrdup(const char * s);
 #endif
-
 #ifdef NO_GETPAGESIZE
 #define getpagesize() sysconf(_SC_PAGESIZE)
 #endif
-
 #ifndef O_CLOEXEC
 #define O_CLOEXEC 0
 #endif
-
 #ifdef FREAD_READS_DIRECTORIES
 # if !defined(SUPPRESS_FOPEN_REDEFINITION)
 #  ifdef fopen
@@ -413,93 +368,68 @@ char *gitstrdup(const char *s);
 #  endif
 #  define fopen(a,b) git_fopen(a,b)
 # endif
-FILE *git_fopen(const char*, const char*);
+FILE * git_fopen(const char * , const char *);
 #endif
-
 #ifdef SNPRINTF_RETURNS_BOGUS
 #ifdef snprintf
 #undef snprintf
 #endif
 #define snprintf git_snprintf
-int git_snprintf(char *str, size_t maxsize,
-		 const char *format, ...);
+int git_snprintf(char * str, size_t maxsize, const char * format, ...);
 #ifdef vsnprintf
 #undef vsnprintf
 #endif
 #define vsnprintf git_vsnprintf
-int git_vsnprintf(char *str, size_t maxsize,
-		  const char *format, va_list ap);
+int git_vsnprintf(char * str, size_t maxsize, const char * format, va_list ap);
 #endif
-
 #ifdef OPEN_RETURNS_EINTR
 #undef open
 #define open git_open_with_retry
-int git_open_with_retry(const char *path, int flag, ...);
+int git_open_with_retry(const char * path, int flag, ...);
 #endif
-
 #ifdef __GLIBC_PREREQ
 #if __GLIBC_PREREQ(2, 1)
 #define HAVE_STRCHRNUL
 #endif
 #endif
-
 #ifndef HAVE_STRCHRNUL
 #define strchrnul gitstrchrnul
-static inline char *gitstrchrnul(const char *s, int c)
-{
-	while (*s && *s != c)
-		s++;
-	return (char *)s;
-}
+static inline char * gitstrchrnul(const char * s, int c) { while ( * s && * s != c) s ++ ; return (char *) s; }
 #endif
-
 #ifdef NO_INET_PTON
-int inet_pton(int af, const char *src, void *dst);
+int inet_pton(int af, const char * src, void * dst);
 #endif
-
 #ifdef NO_INET_NTOP
-const char *inet_ntop(int af, const void *src, char *dst, size_t size);
+const char * inet_ntop(int af, const void * src, char * dst, size_t size);
 #endif
-
 #ifdef NO_PTHREADS
 #define atexit git_atexit
-int git_atexit(void (*handler)(void));
+int git_atexit(void ( * handler)(void));
 #endif
-
 #ifndef HOST_NAME_MAX
 #define HOST_NAME_MAX 256
 #endif
-
 #include "../sane-ctype.h"
 
-void git_stable_qsort(void *base, size_t nmemb, size_t size,
-		      int(*compar)(const void *, const void *));
+void git_stable_qsort(void * base, size_t nmemb, size_t size, int ( * compar)(const void * , const void *));
 #ifdef INTERNAL_QSORT
 #define qsort git_stable_qsort
 #endif
-
 #define QSORT(base, n, compar) sane_qsort((base), (n), sizeof(*(base)), compar)
-static inline void sane_qsort(void *base, size_t nmemb, size_t size,
-			      int(*compar)(const void *, const void *))
+static inline void sane_qsort(void * base, size_t nmemb, size_t size, int ( * compar)(const void * , const void *))
 {
-	if (nmemb > 1)
-		qsort(base, nmemb, size, compar);
+    if (nmemb > 1) qsort(base, nmemb, size, compar);
 }
-
 #define STABLE_QSORT(base, n, compar) \
 	git_stable_qsort((base), (n), sizeof(*(base)), compar)
-
 #ifndef HAVE_ISO_QSORT_S
-int git_qsort_s(void *base, size_t nmemb, size_t size,
-		int (*compar)(const void *, const void *, void *), void *ctx);
+int git_qsort_s(void * base, size_t nmemb, size_t size, int ( * compar)(const void * , const void * , void *), void * ctx);
 #define qsort_s git_qsort_s
 #endif
-
 #define QSORT_S(base, n, compar, ctx) do {			\
 	if (qsort_s((base), (n), sizeof(*(base)), compar, ctx))	\
 		BUG("qsort_s() failed");			\
 } while (0)
-
 #ifdef NO_NSEC
 #define ST_CTIME_NSEC(st) 0
 #define ST_MTIME_NSEC(st) 0
@@ -512,7 +442,6 @@ int git_qsort_s(void *base, size_t nmemb, size_t size,
 #define ST_MTIME_NSEC(st) ((unsigned int)((st).st_mtim.tv_nsec))
 #endif
 #endif
-
 #ifndef va_copy
 /*
  * Since an obvious implementation of va_list would be to make it a
@@ -525,16 +454,9 @@ int git_qsort_s(void *base, size_t nmemb, size_t size,
 #define va_copy(dst, src) ((dst) = (src))
 #endif
 #endif
-
 #ifndef _POSIX_THREAD_SAFE_FUNCTIONS
-static inline void git_flockfile(FILE *fh UNUSED)
-{
-	; /* nothing */
-}
-static inline void git_funlockfile(FILE *fh UNUSED)
-{
-	; /* nothing */
-}
+static inline void git_flockfile(FILE * fh UNUSED) { ; /* nothing */ }
+static inline void git_funlockfile(FILE * fh UNUSED) { ; /* nothing */ }
 #undef flockfile
 #undef funlockfile
 #undef getc_unlocked
@@ -542,17 +464,15 @@ static inline void git_funlockfile(FILE *fh UNUSED)
 #define funlockfile(fh) git_funlockfile(fh)
 #define getc_unlocked(fh) getc(fh)
 #endif
-
 #ifdef FILENO_IS_A_MACRO
-int git_fileno(FILE *stream);
+int git_fileno(FILE * stream);
 # ifndef COMPAT_CODE_FILENO
 #  undef fileno
 #  define fileno(p) git_fileno(p)
 # endif
 #endif
-
 #ifdef NEED_ACCESS_ROOT_HANDLER
-int git_access(const char *path, int mode);
+int git_access(const char * path, int mode);
 # ifndef COMPAT_CODE_ACCESS
 #  ifdef access
 #  undef access
@@ -560,5 +480,4 @@ int git_access(const char *path, int mode);
 #  define access(path, mode) git_access(path, mode)
 # endif
 #endif
-
 #endif /* COMPAT_POSIX_H */

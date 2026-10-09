@@ -19,8 +19,8 @@ struct repository;
 
 /*
  * The core logic for for-each-ref and its clones.
- */
-int for_each_ref_core(int argc, const char **argv, const char *prefix,
-		      struct repository *repo, const char *const *usage);
-
+ */ int for_each_ref_core
+(
+    int argc, const char ** argv, const char * prefix, struct repository * repo, const char * const * usage
+);
 #endif /* FOR_EACH_REF_H */

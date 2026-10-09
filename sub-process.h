@@ -1,6 +1,5 @@
 #ifndef SUBPROCESS_H
 #define SUBPROCESS_H
-
 #include "hashmap.h"
 #include "run-command.h"
 
@@ -17,59 +16,51 @@
  * parent git command terminates, all sub-processes are also terminated.
  *
  * This API is based on the run-command API.
- */
-
- /* data structures */
-
-/* Members should not be accessed directly. */
-struct subprocess_entry {
-	struct hashmap_entry ent;
-	const char *cmd;
-	struct child_process process;
+ */ /* data structures */ /* Members should not be accessed directly. */ struct subprocess_entry
+{
+    struct hashmap_entry ent;
+    const char * cmd;
+    struct child_process process;
 };
 
-struct subprocess_capability {
-	const char *name;
+struct subprocess_capability
+{
+    const char * name;
 
-	/*
+    /*
 	 * subprocess_handshake will "|=" this value to supported_capabilities
 	 * if the server reports that it supports this capability.
-	 */
-	unsigned int flag;
+	 */ unsigned int flag;
 };
 
-/* subprocess functions */
-
-/* Function to test two subprocess hashmap entries for equality. */
-int cmd2process_cmp(const void *unused_cmp_data,
-		    const struct hashmap_entry *e,
-		    const struct hashmap_entry *entry_or_key,
-		    const void *unused_keydata);
+/* subprocess functions */ /* Function to test two subprocess hashmap entries for equality. */ int cmd2process_cmp
+(
+    const void * unused_cmp_data, const struct hashmap_entry * e, const struct hashmap_entry * entry_or_key, const void * unused_keydata
+);
 
 /*
  * User-supplied function to initialize the sub-process.  This is
  * typically used to negotiate the interface version and capabilities.
- */
-typedef int(*subprocess_start_fn)(struct subprocess_entry *entry);
+ */ typedef int
+(
+    * subprocess_start_fn
+)
+(struct subprocess_entry * entry);
 
-/* Start a subprocess and add it to the subprocess hashmap. */
-int subprocess_start(struct hashmap *hashmap, struct subprocess_entry *entry, const char *cmd,
-		subprocess_start_fn startfn);
+/* Start a subprocess and add it to the subprocess hashmap. */ int subprocess_start
+(
+    struct hashmap * hashmap, struct subprocess_entry * entry, const char * cmd, subprocess_start_fn startfn
+);
 
-/* Kill a subprocess and remove it from the subprocess hashmap. */
-void subprocess_stop(struct hashmap *hashmap, struct subprocess_entry *entry);
+/* Kill a subprocess and remove it from the subprocess hashmap. */ void subprocess_stop(struct hashmap * hashmap, struct subprocess_entry * entry);
 
-/* Find a subprocess in the subprocess hashmap. */
-struct subprocess_entry *subprocess_find_entry(struct hashmap *hashmap, const char *cmd);
+/* Find a subprocess in the subprocess hashmap. */ struct subprocess_entry * subprocess_find_entry(struct hashmap * hashmap, const char * cmd);
 
-/* subprocess helper functions */
-
-/* Get the underlying `struct child_process` from a subprocess. */
-static inline struct child_process *subprocess_get_child_process(
-		struct subprocess_entry *entry)
-{
-	return &entry->process;
-}
+/* subprocess helper functions */ /* Get the underlying `struct child_process` from a subprocess. */ static inline struct child_process * subprocess_get_child_process
+(
+    struct subprocess_entry * entry
+)
+{ return & entry->process; }
 
 /*
  * Perform the version and capability negotiation as described in the
@@ -79,19 +70,14 @@ static inline struct child_process *subprocess_get_child_process(
  *
  * This function is typically called when a subprocess is started (as part of
  * the "startfn" passed to subprocess_start).
- */
-int subprocess_handshake(struct subprocess_entry *entry,
-			 const char *welcome_prefix,
-			 int *versions,
-			 int *chosen_version,
-			 struct subprocess_capability *capabilities,
-			 unsigned int *supported_capabilities);
+ */ int subprocess_handshake
+(
+    struct subprocess_entry * entry, const char * welcome_prefix, int * versions, int * chosen_version, struct subprocess_capability * capabilities, unsigned int * supported_capabilities
+);
 
 /*
  * Helper function that will read packets looking for "status=<foo>"
  * key/value pairs and return the value from the last "status" packet
  */
-
-int subprocess_read_status(int fd, struct strbuf *status);
-
+int subprocess_read_status(int fd, struct strbuf * status);
 #endif

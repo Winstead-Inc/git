@@ -1,50 +1,35 @@
 #include "mingw-posix.h"
 
 struct config_context;
-int mingw_core_config(const char *var, const char *value,
-		      const struct config_context *ctx, void *cb);
+int mingw_core_config(const char * var , const char * value, const struct config_context * ctx, void * cb);
 #define platform_core_config mingw_core_config
-
 #ifndef NO_OPENSSL
 #include <openssl/ssl.h>
-static inline int mingw_SSL_set_fd(SSL *ssl, int fd)
-{
-	return SSL_set_fd(ssl, _get_osfhandle(fd));
-}
+static inline int mingw_SSL_set_fd(SSL * ssl, int fd) { return SSL_set_fd(ssl, _get_osfhandle(fd)); }
 #define SSL_set_fd mingw_SSL_set_fd
 
-static inline int mingw_SSL_set_rfd(SSL *ssl, int fd)
-{
-	return SSL_set_rfd(ssl, _get_osfhandle(fd));
-}
+static inline int mingw_SSL_set_rfd(SSL * ssl, int fd) { return SSL_set_rfd(ssl, _get_osfhandle(fd)); }
 #define SSL_set_rfd mingw_SSL_set_rfd
 
-static inline int mingw_SSL_set_wfd(SSL *ssl, int fd)
-{
-	return SSL_set_wfd(ssl, _get_osfhandle(fd));
-}
+static inline int mingw_SSL_set_wfd(SSL * ssl, int fd) { return SSL_set_wfd(ssl, _get_osfhandle(fd)); }
 #define SSL_set_wfd mingw_SSL_set_wfd
 #endif
 
 /*
  * git specific compatibility
  */
-
-static inline void convert_slashes(char *path)
-{
-	for (; *path; path++)
-		if (*path == '\\')
-			*path = '/';
-}
+static inline void convert_slashes(char * path) { for (; * path; path ++) if ( * path == '\\') * path = '/'; }
 #define PATH_SEP ';'
-char *mingw_query_user_email(void);
+char * mingw_query_user_email(void);
 #define query_user_email mingw_query_user_email
 
 /**
  * Verifies that the specified path is owned by the user running the
  * current process.
- */
-int is_path_owned_by_current_sid(const char *path, struct strbuf *report);
+ */ int is_path_owned_by_current_sid
+(
+    const char * path, struct strbuf * report
+);
 #define is_path_owned_by_current_user is_path_owned_by_current_sid
 
 /**
@@ -64,8 +49,10 @@ int is_path_owned_by_current_sid(const char *path, struct strbuf *report);
  * `/dev/null` on Unix/Linux).
  *
  * Returns 1 upon success, otherwise 0.
- */
-int is_valid_win32_path(const char *path, int allow_literal_nul);
+ */ int is_valid_win32_path
+(
+    const char * path, int allow_literal_nul
+);
 #define is_valid_path(path) is_valid_win32_path(path, 0)
 
 /**
@@ -114,29 +101,28 @@ int is_valid_win32_path(const char *path, int allow_literal_nul);
  * Errors:
  * EINVAL: one of the input parameters is invalid (e.g. NULL)
  * ERANGE: the output buffer is too small
- */
-int xutftowcsn(wchar_t *wcs, const char *utf, size_t wcslen, int utflen);
+ */ int xutftowcsn
+(
+    wchar_t * wcs, const char * utf, size_t wcslen, int utflen
+);
 
 /**
  * Simplified variant of xutftowcsn, assumes input string is \0-terminated.
- */
-static inline int xutftowcs(wchar_t *wcs, const char *utf, size_t wcslen)
-{
-	return xutftowcsn(wcs, utf, wcslen, -1);
-}
+ */ static inline int xutftowcs
+(
+    wchar_t * wcs, const char * utf, size_t wcslen
+)
+{ return xutftowcsn(wcs, utf, wcslen, - 1); }
 
 /**
  * Simplified file system specific variant of xutftowcsn, assumes output
  * buffer size is MAX_PATH wide chars and input string is \0-terminated,
  * fails with ENAMETOOLONG if input string is too long.
- */
-static inline int xutftowcs_path(wchar_t *wcs, const char *utf)
-{
-	int result = xutftowcsn(wcs, utf, MAX_PATH, -1);
-	if (result < 0 && errno == ERANGE)
-		errno = ENAMETOOLONG;
-	return result;
-}
+ */ static inline int xutftowcs_path
+(
+    wchar_t * wcs, const char * utf
+)
+{ int result = xutftowcsn(wcs, utf, MAX_PATH, - 1); if (result < 0 && errno == ERANGE) errno = ENAMETOOLONG; return result; }
 
 /**
  * Converts UTF-16LE encoded string to UTF-8.
@@ -169,15 +155,16 @@ static inline int xutftowcs_path(wchar_t *wcs, const char *utf)
  * Errors:
  * EINVAL: one of the input parameters is invalid (e.g. NULL)
  * ERANGE: the output buffer is too small
- */
-int xwcstoutf(char *utf, const wchar_t *wcs, size_t utflen);
+ */ int xwcstoutf
+(
+    char * utf, const wchar_t * wcs, size_t utflen
+);
 
 /*
  * A critical section used in the implementation of the spawn
  * functions (mingw_spawnv[p]e()) and waitpid(). Initialised in
  * the replacement main() macro below.
- */
-extern CRITICAL_SECTION pinfo_cs;
+ */ extern CRITICAL_SECTION pinfo_cs;
 
 /*
  * Git, like most portable C applications, implements a main() function. On
@@ -189,9 +176,11 @@ extern CRITICAL_SECTION pinfo_cs;
  * -municode. This wmain() function reencodes the parameters from UTF-16 to
  * UTF-8 format, sets up a couple of other things as required on Windows, and
  * then hands off to the main() function.
- */
-int wmain(int argc, const wchar_t **w_argv);
-int main(int argc, const char **argv);
+ */ int wmain
+(
+    int argc, const wchar_t ** w_argv
+);
+int main(int argc, const char ** argv);
 
 /*
  * For debugging: if a problem occurs, say, in a Git process that is spawned
@@ -200,17 +189,17 @@ int main(int argc, const char **argv);
  *
  * Call this function to open a new MinTTY (this assumes you are in Git for
  * Windows' SDK) with a GDB that attaches to the current process right away.
- */
-void open_in_gdb(void);
+ */ void open_in_gdb
+(
+    void
+);
 
 /*
  * Used by Pthread API implementation for Windows
- */
-int err_win_to_posix(DWORD winerr);
+ */ int err_win_to_posix(DWORD winerr);
 
 int mingw_platform_has_symlinks(void);
 #define platform_has_symlinks() mingw_platform_has_symlinks()
-
 #ifndef NO_UNIX_SOCKETS
 int mingw_have_unix_sockets(void);
 #undef have_unix_sockets

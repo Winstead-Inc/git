@@ -1,5 +1,4 @@
 #include "git-compat-util.h"
-
 #include "strbuf.h"
 #include "strvec.h"
 #include "trace2.h"
@@ -42,67 +41,62 @@
  */
 #define STAT_PARENT_PID_READ_N 64
 
-static int parse_proc_stat(struct strbuf *sb, struct strbuf *name,
-			    int *statppid)
+static int parse_proc_stat(struct strbuf * sb, struct strbuf * name, int * statppid)
 {
-	const char *comm_lhs = strchr(sb->buf, '(');
-	const char *comm_rhs = strrchr(sb->buf, ')');
-	const char *ppid_lhs, *ppid_rhs;
-	char *p;
-	pid_t ppid;
+    const char * comm_lhs = strchr(sb->buf, '(');
+    const char * comm_rhs = strrchr(sb->buf, ')');
+    const char * ppid_lhs, * ppid_rhs;
+    char * p;
+    pid_t ppid;
 
-	if (!comm_lhs || !comm_rhs)
-		goto bad_kernel;
+    if ( ! comm_lhs || ! comm_rhs) goto bad_kernel;
 
-	/*
+    /*
 	 * We're at the ")", that's followed by " X ", where X is a
 	 * single "state" character. So advance by 4 bytes.
-	 */
-	ppid_lhs = comm_rhs + 4;
+	 */ ppid_lhs = comm_rhs + 4;
 
-	/*
+    /*
 	 * Read until the space between the "ppid" and "pgrp" fields
 	 * to make sure we're anchored after the untruncated "ppid"
 	 * field..
-	 */
-	ppid_rhs = strchr(ppid_lhs, ' ');
-	if (!ppid_rhs)
-		goto bad_kernel;
+	 */ ppid_rhs = strchr
+    (
+        ppid_lhs, ' '
+    );
+    if ( ! ppid_rhs) goto bad_kernel;
 
-	ppid = strtol(ppid_lhs, &p, 10);
-	if (ppid_rhs == p) {
-		const char *comm = comm_lhs + 1;
-		size_t commlen = comm_rhs - comm;
+    ppid = strtol(ppid_lhs, & p, 10);
+    if (ppid_rhs == p)
+    {
+        const char * comm = comm_lhs + 1;
+        size_t commlen = comm_rhs - comm;
 
-		strbuf_add(name, comm, commlen);
-		*statppid = ppid;
+        strbuf_add(name, comm, commlen);
+        * statppid = ppid;
 
-		return 0;
-	}
+        return 0;
+    }
 
-bad_kernel:
-	/*
+    bad_kernel: /*
 	 * We were able to read our STAT_PARENT_PID_READ_N bytes from
 	 * /proc/%d/stat, but the content is bad. Broken kernel?
 	 * Should not happen, but handle it gracefully.
-	 */
-	return -1;
+	 */ return - 1;
 }
 
-static int stat_parent_pid(pid_t pid, struct strbuf *name, int *statppid)
+static int stat_parent_pid(pid_t pid, struct strbuf * name, int * statppid)
 {
-	struct strbuf procfs_path = STRBUF_INIT;
-	struct strbuf sb = STRBUF_INIT;
-	FILE *fp;
-	int ret = -1;
+    struct strbuf procfs_path = STRBUF_INIT;
+    struct strbuf sb = STRBUF_INIT;
+    FILE * fp;
+    int ret = - 1;
 
-	/* try to use procfs if it's present. */
-	strbuf_addf(&procfs_path, "/proc/%d/stat", pid);
-	fp = fopen(procfs_path.buf, "r");
-	if (!fp)
-		goto cleanup;
+    /* try to use procfs if it's present. */ strbuf_addf( & procfs_path, "/proc/%d/stat", pid);
+    fp = fopen(procfs_path.buf, "r");
+    if ( ! fp) goto cleanup;
 
-	/*
+    /*
 	 * We could be more strict here and assert that we read at
 	 * least STAT_PARENT_PID_READ_N. My reading of procfs(5) is
 	 * that on any modern kernel (at least since 2.6.0 released in
@@ -110,67 +104,58 @@ static int stat_parent_pid(pid_t pid, struct strbuf *name, int *statppid)
 	 * out we'd get at least 100 bytes, but let's just check that
 	 * we got anything at all and trust the parse_proc_stat()
 	 * function to handle its "Bad Kernel?" error checking.
-	 */
-	if (!strbuf_fread(&sb, STAT_PARENT_PID_READ_N, fp))
-		goto cleanup;
-	if (parse_proc_stat(&sb, name, statppid) < 0)
-		goto cleanup;
+	 */ if 
+    (
+        ! strbuf_fread( & sb, STAT_PARENT_PID_READ_N, fp)
+    )
+    goto cleanup;
+    if (parse_proc_stat( & sb, name, statppid) < 0) goto cleanup;
 
-	ret = 0;
-cleanup:
-	if (fp)
-		fclose(fp);
-	strbuf_release(&procfs_path);
-	strbuf_release(&sb);
+    ret = 0;
+    cleanup: if (fp) fclose(fp);
+    strbuf_release( & procfs_path);
+    strbuf_release( & sb);
 
-	return ret;
+    return ret;
 }
 
-static void push_ancestry_name(struct strvec *names, pid_t pid)
+static void push_ancestry_name(struct strvec * names, pid_t pid)
 {
-	struct strbuf name = STRBUF_INIT;
-	int ppid;
+    struct strbuf name = STRBUF_INIT;
+    int ppid;
 
-	if (stat_parent_pid(pid, &name, &ppid) < 0)
-		goto cleanup;
+    if (stat_parent_pid(pid, & name, & ppid) < 0) goto cleanup;
 
-	strvec_push(names, name.buf);
+    strvec_push(names, name.buf);
 
-	/*
+    /*
 	 * Both errors and reaching the end of the process chain are
 	 * reported as fields of 0 by proc(5)
-	 */
-	if (ppid)
-		push_ancestry_name(names, ppid);
-cleanup:
-	strbuf_release(&name);
+	 */ if (ppid) push_ancestry_name(names, ppid);
+    cleanup: strbuf_release( & name);
 
-	return;
+    return ;
 }
 
 void trace2_collect_process_info(enum trace2_process_info_reason reason)
 {
-	struct strvec names = STRVEC_INIT;
+    struct strvec names = STRVEC_INIT;
 
-	if (!trace2_is_enabled())
-		return;
+    if ( ! trace2_is_enabled()) return ;
 
-	switch (reason) {
-	case TRACE2_PROCESS_INFO_EXIT:
-		/*
+    switch (reason)
+    {
+        case TRACE2_PROCESS_INFO_EXIT: /*
 		 * The Windows version of this calls its
 		 * get_peak_memory_info() here. We may want to insert
 		 * similar process-end statistics here in the future.
-		 */
-		break;
-	case TRACE2_PROCESS_INFO_STARTUP:
-		push_ancestry_name(&names, getppid());
+		 */ break;
+        case TRACE2_PROCESS_INFO_STARTUP: push_ancestry_name( & names, getppid());
 
-		if (names.nr)
-			trace2_cmd_ancestry(names.v);
-		strvec_clear(&names);
-		break;
-	}
+        if (names.nr) trace2_cmd_ancestry(names.v);
+        strvec_clear( & names);
+        break;
+    }
 
-	return;
+    return ;
 }

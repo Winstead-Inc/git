@@ -1,6 +1,5 @@
 #ifndef REFS_REF_CACHE_H
 #define REFS_REF_CACHE_H
-
 #include "hash.h"
 
 struct ref_dir;
@@ -11,21 +10,21 @@ struct repository;
  * If this ref_cache is filled lazily, this function is used to load
  * information into the specified ref_dir (shallow or deep, at the
  * option of the ref_store). dirname includes a trailing slash.
- */
-typedef void fill_ref_dir_fn(struct ref_store *ref_store,
-			     struct ref_dir *dir, const char *dirname);
+ */ typedef void fill_ref_dir_fn
+(
+    struct ref_store * ref_store, struct ref_dir * dir, const char * dirname
+);
 
-struct ref_cache {
-	struct ref_entry *root;
+struct ref_cache
+{
+    struct ref_entry * root;
 
-	/* A pointer to the ref_store whose cache this is: */
-	struct ref_store *ref_store;
+    /* A pointer to the ref_store whose cache this is: */ struct ref_store * ref_store;
 
-	/*
+    /*
 	 * Function used (if necessary) to lazily-fill cache. May be
 	 * NULL.
-	 */
-	fill_ref_dir_fn *fill_ref_dir;
+	 */ fill_ref_dir_fn * fill_ref_dir;
 };
 
 /*
@@ -33,16 +32,15 @@ struct ref_cache {
  * describe a single cached reference.  This data structure only
  * occurs embedded in a union in struct ref_entry, and only when
  * (ref_entry->flag & REF_DIR) is zero.
- */
-struct ref_value {
-	/*
+ */ struct ref_value
+{
+    /*
 	 * The name of the object to which this reference resolves
 	 * (which may be a tag object).  If REF_ISBROKEN, this is
 	 * null.  If REF_ISSYMREF, then this is the name of the object
 	 * referred to by the last reference in the symlink chain.
-	 */
-	struct object_id oid;
-	char *referent;
+	 */ struct object_id oid;
+    char * referent;
 };
 
 /*
@@ -70,31 +68,27 @@ struct ref_value {
  * in that directory are stored, and REF_INCOMPLETE stubs are created
  * for any subdirectories, but the subdirectories themselves are not
  * read.  The reading is triggered by get_ref_dir().
- */
-struct ref_dir {
-	int nr, alloc;
+ */ struct ref_dir
+{
+    int nr, alloc;
 
-	/*
+    /*
 	 * Entries with index 0 <= i < sorted are sorted by name.  New
 	 * entries are appended to the list unsorted, and are sorted
 	 * only when required; thus we avoid the need to sort the list
 	 * after the addition of every reference.
-	 */
-	int sorted;
+	 */ int sorted;
 
-	/* The ref_cache containing this entry: */
-	struct ref_cache *cache;
+    /* The ref_cache containing this entry: */ struct ref_cache * cache;
 
-	struct ref_entry **entries;
+    struct ref_entry ** entries;
 };
 
 /*
  * Bit values for ref_entry::flag.  REF_ISSYMREF=0x01,
  * REF_ISPACKED=0x02, REF_ISBROKEN=0x04 and REF_BAD_NAME=0x08 are
  * public values; see refs.h.
- */
-
-/* ref_entry represents a directory of references */
+ */ /* ref_entry represents a directory of references */
 #define REF_DIR 0x10
 
 /*
@@ -141,41 +135,42 @@ struct ref_dir {
  * would break callback functions, who have always been able to assume
  * that the name strings that they are passed will not be freed during
  * the iteration.
- */
-struct ref_entry {
-	unsigned char flag; /* ISSYMREF? ISPACKED? */
-	union {
-		struct ref_value value; /* if not (flags&REF_DIR) */
-		struct ref_dir subdir; /* if (flags&REF_DIR) */
-	} u;
-	/*
+ */ struct ref_entry
+{
+    unsigned char flag;
+/* ISSYMREF? ISPACKED? */ union { struct ref_value value; /* if not (flags&REF_DIR) */ struct ref_dir subdir; /* if (flags&REF_DIR) */ }
+    u;
+    /*
 	 * The full name of the reference (e.g., "refs/heads/master")
 	 * or the full name of the directory with a trailing slash
 	 * (e.g., "refs/heads/"):
-	 */
-	char name[FLEX_ARRAY];
+	 */ char name
+    [
+        FLEX_ARRAY
+    ];
 };
 
 /*
  * Return the index of the entry with the given refname from the
  * ref_dir (non-recursively), sorting dir if necessary.  Return -1 if
  * no such entry is found.  dir must already be complete.
- */
-int search_ref_dir(struct ref_dir *dir, const char *refname, size_t len);
+ */ int search_ref_dir
+(
+    struct ref_dir * dir, const char * refname, size_t len
+);
 
-struct ref_dir *get_ref_dir(struct ref_entry *entry);
+struct ref_dir * get_ref_dir(struct ref_entry * entry);
 
 /*
  * Create a struct ref_entry object for the specified dirname.
  * dirname is the name of the directory with a trailing slash (e.g.,
  * "refs/heads/") or "" for the top-level directory.
- */
-struct ref_entry *create_dir_entry(struct ref_cache *cache,
-				   const char *dirname, size_t len);
+ */ struct ref_entry * create_dir_entry
+(
+    struct ref_cache * cache, const char * dirname, size_t len
+);
 
-struct ref_entry *create_ref_entry(const char *refname,
-				   const char *referent,
-				   const struct object_id *oid, int flag);
+struct ref_entry * create_ref_entry(const char * refname, const char * referent, const struct object_id * oid, int flag);
 
 /*
  * Return a pointer to a new `ref_cache`. Its top-level starts out
@@ -185,21 +180,23 @@ struct ref_entry *create_ref_entry(const char *refname,
  * `ref_cache` must be filled (including clearing its directories'
  * `REF_INCOMPLETE` bits) before it is used, and `refs` can be NULL,
  * too.
- */
-struct ref_cache *create_ref_cache(struct ref_store *refs,
-				   fill_ref_dir_fn *fill_ref_dir);
+ */ struct ref_cache * create_ref_cache
+(
+    struct ref_store * refs, fill_ref_dir_fn * fill_ref_dir
+);
 
 /*
  * Free the `ref_cache` and all of its associated data.
- */
-void free_ref_cache(struct ref_cache *cache);
+ */ void free_ref_cache(struct ref_cache * cache);
 
 /*
  * Add a ref_entry to the end of dir (unsorted).  Entry is always
  * stored directly in dir; no recursion into subdirectories is
  * done.
- */
-void add_entry_to_dir(struct ref_dir *dir, struct ref_entry *entry);
+ */ void add_entry_to_dir
+(
+    struct ref_dir * dir, struct ref_entry * entry
+);
 
 /*
  * Start iterating over references in `cache`. If `prefix` is
@@ -207,10 +204,8 @@ void add_entry_to_dir(struct ref_dir *dir, struct ref_entry *entry);
  * prefix. If `prime_dir` is true, then fill any incomplete
  * directories before beginning the iteration. The output is ordered
  * by refname.
- */
-struct ref_iterator *cache_ref_iterator_begin(struct ref_cache *cache,
-					      const char *prefix,
-					      struct repository *repo,
-					      int prime_dir);
-
+ */ struct ref_iterator * cache_ref_iterator_begin
+(
+    struct ref_cache * cache, const char * prefix, struct repository * repo, int prime_dir
+);
 #endif /* REFS_REF_CACHE_H */

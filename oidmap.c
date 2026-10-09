@@ -2,78 +2,60 @@
 #include "hash.h"
 #include "oidmap.h"
 
-static int oidmap_neq(const void *hashmap_cmp_fn_data UNUSED,
-		      const struct hashmap_entry *e1,
-		      const struct hashmap_entry *e2,
-		      const void *keydata)
+static int oidmap_neq(const void * hashmap_cmp_fn_data UNUSED, const struct hashmap_entry * e1, const struct hashmap_entry * e2, const void * keydata)
 {
-	const struct oidmap_entry *a, *b;
+    const struct oidmap_entry * a, * b;
 
-	a = container_of(e1, const struct oidmap_entry, internal_entry);
-	b = container_of(e2, const struct oidmap_entry, internal_entry);
+    a = container_of(e1, const struct oidmap_entry, internal_entry);
+    b = container_of(e2, const struct oidmap_entry, internal_entry);
 
-	if (keydata)
-		return !oideq(&a->oid, (const struct object_id *) keydata);
-	return !oideq(&a->oid, &b->oid);
+    if (keydata) return ! oideq( & a->oid, (const struct object_id *) keydata);
+    return ! oideq( & a->oid, & b->oid);
 }
 
-void oidmap_init(struct oidmap *map, size_t initial_size)
+void oidmap_init(struct oidmap * map, size_t initial_size) { hashmap_init( & map->map, oidmap_neq, NULL, initial_size); }
+
+void oidmap_clear(struct oidmap * map, int free_entries) { oidmap_clear_with_free(map, free_entries? free: NULL); }
+
+void oidmap_clear_with_free(struct oidmap * map, oidmap_free_fn free_fn)
 {
-	hashmap_init(&map->map, oidmap_neq, NULL, initial_size);
+    struct hashmap_iter iter;
+    struct hashmap_entry * e;
+
+    if ( ! map || ! map->map.cmpfn) return ;
+
+    hashmap_iter_init( & map->map, & iter); while ((e = hashmap_iter_next( & iter)))
+    {
+        struct oidmap_entry * entry = container_of(e, struct oidmap_entry, internal_entry);
+        if (free_fn) free_fn(entry);
+    }
+
+    hashmap_clear( & map->map);
 }
 
-void oidmap_clear(struct oidmap *map, int free_entries)
+void * oidmap_get(const struct oidmap * map, const struct object_id * key)
 {
-	oidmap_clear_with_free(map,
-		free_entries ? free : NULL);
+    if ( ! map->map.cmpfn) return NULL;
+
+    return hashmap_get_from_hash( & map->map, oidhash(key), key);
 }
 
-void oidmap_clear_with_free(struct oidmap *map,
-			    oidmap_free_fn free_fn)
+void * oidmap_remove(struct oidmap * map, const struct object_id * key)
 {
-	struct hashmap_iter iter;
-	struct hashmap_entry *e;
+    struct hashmap_entry entry;
 
-	if (!map || !map->map.cmpfn)
-		return;
+    if ( ! map->map.cmpfn) oidmap_init(map, 0);
 
-	hashmap_iter_init(&map->map, &iter);
-	while ((e = hashmap_iter_next(&iter))) {
-		struct oidmap_entry *entry =
-			container_of(e, struct oidmap_entry, internal_entry);
-		if (free_fn)
-			free_fn(entry);
-	}
-
-	hashmap_clear(&map->map);
+    hashmap_entry_init( & entry, oidhash(key));
+    return hashmap_remove( & map->map, & entry, key);
 }
 
-void *oidmap_get(const struct oidmap *map, const struct object_id *key)
+void * oidmap_put(struct oidmap * map, void * entry)
 {
-	if (!map->map.cmpfn)
-		return NULL;
+    struct oidmap_entry * to_put = entry;
 
-	return hashmap_get_from_hash(&map->map, oidhash(key), key);
-}
+    if ( ! map->map.cmpfn) oidmap_init(map, 0);
 
-void *oidmap_remove(struct oidmap *map, const struct object_id *key)
-{
-	struct hashmap_entry entry;
-
-	if (!map->map.cmpfn)
-		oidmap_init(map, 0);
-
-	hashmap_entry_init(&entry, oidhash(key));
-	return hashmap_remove(&map->map, &entry, key);
-}
-
-void *oidmap_put(struct oidmap *map, void *entry)
-{
-	struct oidmap_entry *to_put = entry;
-
-	if (!map->map.cmpfn)
-		oidmap_init(map, 0);
-
-	hashmap_entry_init(&to_put->internal_entry, oidhash(&to_put->oid));
-	return hashmap_put(&map->map, &to_put->internal_entry);
+    hashmap_entry_init( & to_put->internal_entry, oidhash( & to_put->oid));
+    return hashmap_put( & map->map, & to_put->internal_entry);
 }

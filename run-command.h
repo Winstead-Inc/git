@@ -1,8 +1,6 @@
 #ifndef RUN_COMMAND_H
 #define RUN_COMMAND_H
-
 #include "thread-utils.h"
-
 #include "strvec.h"
 
 struct repository;
@@ -15,10 +13,7 @@ struct repository;
  * A similar API offers the capability to run a function asynchronously,
  * which is primarily used to capture the output that the function
  * produces in the caller in order to process it.
- */
-
-
-/**
+ */ /**
  * This describes the arguments, redirections, and environment of a
  * command to run in a sub-process.
  *
@@ -42,10 +37,10 @@ struct repository;
  *		stderr. This happens after stderr is itself redirected.
  *		So stdout will follow stderr to wherever it is
  *		redirected.
- */
-struct child_process {
+ */ struct child_process
+{
 
-	/**
+    /**
 	 * The .args is a `struct strvec', use that API to manipulate
 	 * it, e.g. strvec_pushv() to add an existing "const char **"
 	 * vector.
@@ -56,10 +51,9 @@ struct child_process {
 	 *
 	 * The memory in .args will be cleaned up automatically during
 	 * `finish_command` (or during `start_command` when it is unsuccessful).
-	 */
-	struct strvec args;
+	 */ struct strvec args;
 
-	/**
+    /**
 	 * Like .args the .env is a `struct strvec'.
 	 *
 	 * To modify the environment of the sub-process, specify an array of
@@ -74,16 +68,15 @@ struct child_process {
 	 *
 	 * The memory in .env will be cleaned up automatically during
 	 * `finish_command` (or during `start_command` when it is unsuccessful).
-	 */
-	struct strvec env;
-	pid_t pid;
+	 */ struct strvec env;
+    pid_t pid;
 
-	int trace2_child_id;
-	uint64_t trace2_child_us_start;
-	const char *trace2_child_class;
-	const char *trace2_hook_name;
+    int trace2_child_id;
+    uint64_t trace2_child_us_start;
+    const char * trace2_child_class;
+    const char * trace2_hook_name;
 
-	/*
+    /*
 	 * Using .in, .out, .err:
 	 * - Specify 0 for no redirections. No new file descriptor is allocated.
 	 * (child inherits stdin, stdout, stderr from parent).
@@ -100,61 +93,53 @@ struct child_process {
 	 *     .err: a writable FD, becomes child's stderr
 	 *   The specified FD is closed by start_command(), even in case
 	 *   of errors!
-	 */
-	int in;
-	int out;
-	int err;
+	 */ int in;
+    int out;
+    int err;
 
-	/**
+    /**
 	 * To specify a new initial working directory for the sub-process,
 	 * specify it in the .dir member.
-	 */
-	const char *dir;
+	 */ const char * dir;
 
-	unsigned no_stdin:1;
-	unsigned no_stdout:1;
-	unsigned no_stderr:1;
-	unsigned git_cmd:1; /* if this is to be git sub-command */
-
-	/**
+    unsigned no_stdin: 1;
+    unsigned no_stdout: 1;
+    unsigned no_stderr: 1;
+    unsigned git_cmd: 1;
+/* if this is to be git sub-command */ /**
 	 * If the program cannot be found, the functions return -1 and set
 	 * errno to ENOENT. Normally, an error message is printed, but if
 	 * .silent_exec_failure is set to 1, no message is printed for this
 	 * special error condition.
-	 */
-	unsigned silent_exec_failure:1;
+	 */ unsigned silent_exec_failure: 1;
 
-	/**
+    /**
 	 * Run the command from argv[0] using a shell (but note that we may
 	 * still optimize out the shell call if the command contains no
 	 * metacharacters). Note that further arguments to the command in
 	 * argv[1], etc, do not need to be shell-quoted.
-	 */
-	unsigned use_shell:1;
+	 */ unsigned use_shell: 1;
 
-	/**
+    /**
 	 * Release any open file handles to the object store before running
 	 * the command; This is necessary e.g. when the spawned process may
 	 * want to repack because that would delete `.pack` files (and on
 	 * Windows, you cannot delete files that are still in use).
-	 */
-	struct object_database *odb_to_close;
+	 */ struct object_database * odb_to_close;
 
-	unsigned stdout_to_stderr:1;
-	unsigned clean_on_exit:1;
-	unsigned wait_after_clean:1;
+    unsigned stdout_to_stderr: 1;
+    unsigned clean_on_exit: 1;
+    unsigned wait_after_clean: 1;
 
-	/**
+    /**
 	 * Close file descriptors 3 and above in the child after forking
 	 * but before exec.  This prevents the child from inheriting
 	 * pipe endpoints or other descriptors from the parent
 	 * environment (e.g., the test harness).
-	 */
-	unsigned close_fd_above_stderr:1;
+	 */ unsigned close_fd_above_stderr: 1;
 
-	void (*clean_on_exit_handler)(struct child_process *process);
+    void( * clean_on_exit_handler)(struct child_process * process);
 };
-
 #define CHILD_PROCESS_INIT { \
 	.args = STRVEC_INIT, \
 	.env = STRVEC_INIT, \
@@ -177,22 +162,24 @@ struct child_process {
  *   signal number + 128, ie. the same value that a POSIX shell's $? would
  *   report.  A diagnostic is printed.
  *
- */
-
-/**
+ */ /**
  * Initialize a struct child_process variable.
- */
-void child_process_init(struct child_process *);
+ */ void child_process_init
+(
+    struct child_process * 
+);
 
 /**
  * Release the memory associated with the struct child_process.
  * Most users of the run-command API don't need to call this
  * function explicitly because `start_command` invokes it on
  * failure and `finish_command` calls it automatically already.
- */
-void child_process_clear(struct child_process *);
+ */ void child_process_clear
+(
+    struct child_process * 
+);
 
-int is_executable(const char *name);
+int is_executable(const char * name);
 
 /**
  * Check if the command exists on $PATH. This emulates the path search that
@@ -203,26 +190,28 @@ int is_executable(const char *name);
  * The caller should ensure that command contains no directory separators.
  *
  * Returns 1 if it is found in $PATH or 0 if the command could not be found.
- */
-int exists_in_PATH(const char *command);
+ */ int exists_in_PATH
+(
+    const char * command
+);
 
 /**
  * Return the path that is used to execute Unix shell command-lines.
- */
-char *git_shell_path(void);
+ */ char * git_shell_path(void);
 
 /**
  * Start a sub-process. Takes a pointer to a `struct child_process`
  * that specifies the details and returns pipe FDs (if requested).
  * See below for details.
- */
-int start_command(struct child_process *);
+ */ int start_command
+(
+    struct child_process * 
+);
 
 /**
  * Wait for the completion of a sub-process that was started with
  * start_command().
- */
-int finish_command(struct child_process *);
+ */ int finish_command(struct child_process *);
 
 int finish_command_in_signal(struct child_process *);
 
@@ -230,21 +219,23 @@ int finish_command_in_signal(struct child_process *);
  * A convenience function that encapsulates a sequence of
  * start_command() followed by finish_command(). Takes a pointer
  * to a `struct child_process` that specifies the details.
- */
-int run_command(struct child_process *);
+ */ int run_command
+(
+    struct child_process * 
+);
 
 /*
  * Prepare a `struct child_process` to run auto-maintenance. Returns 1 if the
  * process has been prepared and is ready to run, or 0 in case auto-maintenance
  * should be skipped.
- */
-int prepare_auto_maintenance(struct repository *r, int quiet,
-			     struct child_process *maint);
+ */ int prepare_auto_maintenance
+(
+    struct repository * r, int quiet, struct child_process * maint
+);
 
 /*
  * Trigger an auto-gc
- */
-int run_auto_maintenance(struct repository *r, int quiet);
+ */ int run_auto_maintenance(struct repository * r, int quiet);
 
 /**
  * Execute the given command, sending "in" to its stdin, and capturing its
@@ -259,22 +250,19 @@ int run_auto_maintenance(struct repository *r, int quiet);
  * The fields of "cmd" should be set up as they would for a normal run_command
  * invocation. But note that there is no need to set the in, out, or err
  * fields; pipe_command handles that automatically.
- */
-int pipe_command(struct child_process *cmd,
-		 const char *in, size_t in_len,
-		 struct strbuf *out, size_t out_hint,
-		 struct strbuf *err, size_t err_hint);
+ */ int pipe_command
+(
+    struct child_process * cmd, const char * in, size_t in_len, struct strbuf * out, size_t out_hint, struct strbuf * err, size_t err_hint
+);
 
 /**
  * Convenience wrapper around pipe_command for the common case
  * of capturing only stdout.
- */
-static inline int capture_command(struct child_process *cmd,
-				  struct strbuf *out,
-				  size_t hint)
-{
-	return pipe_command(cmd, NULL, 0, out, hint, NULL, 0);
-}
+ */ static inline int capture_command
+(
+    struct child_process * cmd, struct strbuf * out, size_t hint
+)
+{ return pipe_command(cmd, NULL, 0, out, hint, NULL, 0); }
 
 /*
  * The purpose of the following functions is to feed a pipe by running
@@ -306,10 +294,10 @@ static inline int capture_command(struct child_process *cmd,
  * - It must not change the program's state that the caller of the
  *   facility also uses.
  *
- */
-struct async {
+ */ struct async
+{
 
-	/**
+    /**
 	 * The function pointer in .proc has the following signature:
 	 *
 	 *	int proc(int in, int out, void *data);
@@ -327,12 +315,15 @@ struct async {
 	 *  on failure. If the function indicates failure, finish_async() will
 	 *  report failure as well.
 	 *
-	 */
-	int (*proc)(int in, int out, void *data);
+	 */ int
+    (
+        * proc
+    )
+(int in, int out, void * data);
 
-	void *data;
+    void * data;
 
-	/**
+    /**
 	 * The members .in, .out are used to provide a set of fd's for
 	 * communication between the caller and the callee as follows:
 	 *
@@ -360,31 +351,32 @@ struct async {
 	 *
 	 *   The specified FD is closed by start_async(), even if it fails to
 	 *   run the function.
-	 */
-	int in;		/* caller writes here and closes it */
-	int out;	/* caller reads from here and closes it */
+	 */ int in;
+/* caller writes here and closes it */ int out;
+/* caller reads from here and closes it */
 #ifdef NO_PTHREADS
-	pid_t pid;
+    pid_t pid;
 #else
-	pthread_t tid;
-	int proc_in;
-	int proc_out;
+    pthread_t tid;
+    int proc_in;
+    int proc_out;
 #endif
-	int isolate_sigpipe;
+    int isolate_sigpipe;
 };
 
 /**
  * Run a function asynchronously. Takes a pointer to a `struct
  * async` that specifies the details and returns a set of pipe FDs
  * for communication with the function. See below for details.
- */
-int start_async(struct async *async);
+ */ int start_async
+(
+    struct async * async
+);
 
 /**
  * Wait for the completion of an asynchronous function that was
  * started with start_async().
- */
-int finish_async(struct async *async);
+ */ int finish_async(struct async * async);
 
 int in_async(void);
 int async_with_fork(void);
@@ -408,11 +400,11 @@ void check_pipe(int err);
  * Return 0 if there are currently no more tasks to be processed.
  * To send a signal to other child processes for abortion,
  * return the negative signal number.
- */
-typedef int (*get_next_task_fn)(struct child_process *cp,
-				struct strbuf *out,
-				void *pp_cb,
-				void **pp_task_cb);
+ */ typedef int
+(
+    * get_next_task_fn
+)
+(struct child_process * cp, struct strbuf * out, void * pp_cb, void ** pp_task_cb);
 
 /**
  * This callback is called whenever there are problems starting
@@ -427,10 +419,11 @@ typedef int (*get_next_task_fn)(struct child_process *cp,
  * Return 0 to continue the parallel processing. To abort return non zero.
  * To send a signal to other child processes for abortion, return
  * the negative signal number.
- */
-typedef int (*start_failure_fn)(struct strbuf *out,
-				void *pp_cb,
-				void *pp_task_cb);
+ */ typedef int
+(
+    * start_failure_fn
+)
+(struct strbuf * out, void * pp_cb, void * pp_task_cb);
 
 /**
  * This callback is repeatedly called on every child process who requests
@@ -442,10 +435,11 @@ typedef int (*start_failure_fn)(struct strbuf *out,
  * Returns < 0 for error
  * Returns == 0 when there is more data to be fed (will be called again)
  * Returns > 0 when finished (child closed fd or no more data to be fed)
- */
-typedef int (*feed_pipe_fn)(int child_in,
-				void *pp_cb,
-				void *pp_task_cb);
+ */ typedef int
+(
+    * feed_pipe_fn
+)
+(int child_in, void * pp_cb, void * pp_task_cb);
 
 /**
  * This callback is called on every child process that finished processing.
@@ -459,64 +453,55 @@ typedef int (*feed_pipe_fn)(int child_in,
  * Return 0 to continue the parallel processing.  To abort return non zero.
  * To send a signal to other child processes for abortion, return
  * the negative signal number.
- */
-typedef int (*task_finished_fn)(int result,
-				struct strbuf *out,
-				void *pp_cb,
-				void *pp_task_cb);
+ */ typedef int
+(
+    * task_finished_fn
+)
+(int result, struct strbuf * out, void * pp_cb, void * pp_task_cb);
 
 /**
  * Option used by run_processes_parallel(), { 0 }-initialized means no
  * options.
- */
-struct run_process_parallel_opts
+ */ struct run_process_parallel_opts
 {
-	/**
+    /**
 	 * tr2_category & tr2_label: sets the trace2 category and label for
 	 * logging. These must either be unset, or both of them must be set.
-	 */
-	const char *tr2_category;
-	const char *tr2_label;
+	 */ const char * tr2_category;
+    const char * tr2_label;
 
-	/**
+    /**
 	 * processes: see 'processes' in run_processes_parallel() below.
-	 */
-	size_t processes;
+	 */ size_t processes;
 
-	/**
+    /**
 	 * ungroup: see 'ungroup' in run_processes_parallel() below.
-	 */
-	unsigned int ungroup:1;
+	 */ unsigned int ungroup: 1;
 
-	/**
+    /**
 	 * get_next_task: See get_next_task_fn() above. This must be
 	 * specified.
-	 */
-	get_next_task_fn get_next_task;
+	 */ get_next_task_fn get_next_task;
 
-	/**
+    /**
 	 * start_failure: See start_failure_fn() above. This can be
 	 * NULL to omit any special handling.
-	 */
-	start_failure_fn start_failure;
+	 */ start_failure_fn start_failure;
 
-	/*
+    /*
 	 * feed_pipe: see feed_pipe_fn() above. This can be NULL to omit any
 	 * special handling.
-	 */
-	feed_pipe_fn feed_pipe;
+	 */ feed_pipe_fn feed_pipe;
 
-	/**
+    /**
 	 * task_finished: See task_finished_fn() above. This can be
 	 * NULL to omit any special handling.
-	 */
-	task_finished_fn task_finished;
+	 */ task_finished_fn task_finished;
 
-	/**
+    /**
 	 * data: user data, will be passed as "pp_cb" to the callback
 	 * parameters.
-	 */
-	void *data;
+	 */ void * data;
 };
 
 /**
@@ -539,42 +524,35 @@ struct run_process_parallel_opts
  * NULL "struct strbuf *out" parameter, and are responsible for
  * emitting their own output, including dealing with any race
  * conditions due to writing in parallel to stdout and stderr.
- */
-void run_processes_parallel(const struct run_process_parallel_opts *opts);
+ */ void run_processes_parallel
+(
+    const struct run_process_parallel_opts * opts
+);
 
 /**
  * Unset all local-repo GIT_* variables in env; see local_repo_env in
  * environment.h. GIT_CONFIG_PARAMETERS and GIT_CONFIG_COUNT are preserved
  * to pass -c and --config-env options from the parent process.
- */
-void sanitize_repo_env(struct strvec *env);
+ */ void sanitize_repo_env
+(
+    struct strvec * env
+);
 
 /**
  * Convenience function which prepares env for a command to be run in a
  * new repo. This removes variables pointing to the local repository (using
  * sanitize_repo_env() above), and adds an environment variable pointing to
  * new_git_dir.
- */
-void prepare_other_repo_env(struct strvec *env, const char *new_git_dir);
+ */ void prepare_other_repo_env
+(
+    struct strvec * env, const char * new_git_dir
+);
 
 /**
  * Possible return values for start_bg_command().
- */
-enum start_bg_result {
-	/* child process is "ready" */
-	SBGR_READY = 0,
-
-	/* child process could not be started */
-	SBGR_ERROR,
-
-	/* callback error when testing for "ready" */
-	SBGR_CB_ERROR,
-
-	/* timeout expired waiting for child to become "ready" */
-	SBGR_TIMEOUT,
-
-	/* child process exited or was signalled before becoming "ready" */
-	SBGR_DIED,
+ */ enum start_bg_result
+{
+    /* child process is "ready" */ SBGR_READY = 0, /* child process could not be started */ SBGR_ERROR, /* callback error when testing for "ready" */ SBGR_CB_ERROR, /* timeout expired waiting for child to become "ready" */ SBGR_TIMEOUT, /* child process exited or was signalled before becoming "ready" */ SBGR_DIED, 
 };
 
 /**
@@ -587,8 +565,11 @@ enum start_bg_result {
  * Returns 1 is child needs more time (subject to the requested timeout).
  * Returns 0 if child is "ready".
  * Returns -1 on any error and cause start_bg_command() to also error out.
- */
-typedef int(start_bg_wait_cb)(const struct child_process *cmd, void *cb_data);
+ */ typedef int
+(
+    start_bg_wait_cb
+)
+(const struct child_process * cmd, void * cb_data);
 
 /**
  * Start a command in the background.  Wait long enough for the child
@@ -608,12 +589,10 @@ typedef int(start_bg_wait_cb)(const struct child_process *cmd, void *cb_data);
  *
  * The opaque cb_data argument will be forwarded to the callback for
  * any instance data that it might require.  This may be NULL.
- */
-enum start_bg_result start_bg_command(struct child_process *cmd,
-				      start_bg_wait_cb *wait_cb,
-				      void *cb_data,
-				      unsigned int timeout_sec);
+ */ enum start_bg_result start_bg_command
+(
+    struct child_process * cmd, start_bg_wait_cb * wait_cb, void * cb_data, unsigned int timeout_sec
+);
 
-int sane_execvp(const char *file, char *const argv[]);
-
+int sane_execvp(const char * file, char * const argv[]);
 #endif

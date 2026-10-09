@@ -21,7 +21,6 @@
  * License along with this library; if not, see
  * <https://www.gnu.org/licenses/>.
  */
-
 #ifndef LIST_H
 #define LIST_H	1
 
@@ -29,11 +28,9 @@
  * The definitions of this file are adopted from those which can be
  * found in the Linux kernel headers to enable people familiar with the
  * latter find their way in these sources as well.
- */
-
-/* Basic type for the double-link list. */
-struct list_head {
-	struct list_head *next, *prev;
+ */ /* Basic type for the double-link list. */ struct list_head
+{
+    struct list_head * next, * prev;
 };
 
 /* avoid conflicts with BSD-only sys/queue.h */
@@ -45,76 +42,60 @@ struct list_head {
 /* Initialize a new list head. */
 #define INIT_LIST_HEAD(ptr) \
 	(ptr)->next = (ptr)->prev = (ptr)
-
 #define LIST_HEAD_INIT(name) { \
 	.next = &(name), \
 	.prev = &(name), \
 }
 
-/* Add new element at the head of the list. */
-static inline void list_add(struct list_head *newp, struct list_head *head)
+/* Add new element at the head of the list. */ static inline void list_add(struct list_head * newp, struct list_head * head)
 {
-	head->next->prev = newp;
-	newp->next = head->next;
-	newp->prev = head;
-	head->next = newp;
+    head->next->prev = newp;
+    newp->next = head->next;
+    newp->prev = head;
+    head->next = newp;
 }
 
-/* Add new element at the tail of the list. */
-static inline void list_add_tail(struct list_head *newp, struct list_head *head)
+/* Add new element at the tail of the list. */ static inline void list_add_tail(struct list_head * newp, struct list_head * head)
 {
-	head->prev->next = newp;
-	newp->next = head;
-	newp->prev = head->prev;
-	head->prev = newp;
+    head->prev->next = newp;
+    newp->next = head;
+    newp->prev = head->prev;
+    head->prev = newp;
 }
 
-/* Remove element from list. */
-static inline void __list_del(struct list_head *prev, struct list_head *next)
+/* Remove element from list. */ static inline void __list_del(struct list_head * prev, struct list_head * next) { next->prev = prev; prev->next = next; }
+
+/* Remove element from list. */ static inline void list_del(struct list_head * elem) { __list_del(elem->prev, elem->next); }
+
+/* Remove element from list, initializing the element's list pointers. */ static inline void list_del_init(struct list_head * elem)
 {
-	next->prev = prev;
-	prev->next = next;
+    list_del(elem);
+    INIT_LIST_HEAD(elem);
 }
 
-/* Remove element from list. */
-static inline void list_del(struct list_head *elem)
+/* Delete from list, add to another list as head. */ static inline void list_move(struct list_head * elem, struct list_head * head)
 {
-	__list_del(elem->prev, elem->next);
+    __list_del(elem->prev, elem->next);
+    list_add(elem, head);
 }
 
-/* Remove element from list, initializing the element's list pointers. */
-static inline void list_del_init(struct list_head *elem)
+/* Replace an old entry. */ static inline void list_replace(struct list_head * old, struct list_head * newp)
 {
-	list_del(elem);
-	INIT_LIST_HEAD(elem);
+    newp->next = old->next;
+    newp->prev = old->prev;
+    newp->prev->next = newp;
+    newp->next->prev = newp;
 }
 
-/* Delete from list, add to another list as head. */
-static inline void list_move(struct list_head *elem, struct list_head *head)
+/* Join two lists. */ static inline void list_splice(struct list_head * add, struct list_head * head)
 {
-	__list_del(elem->prev, elem->next);
-	list_add(elem, head);
-}
-
-/* Replace an old entry. */
-static inline void list_replace(struct list_head *old, struct list_head *newp)
-{
-	newp->next = old->next;
-	newp->prev = old->prev;
-	newp->prev->next = newp;
-	newp->next->prev = newp;
-}
-
-/* Join two lists. */
-static inline void list_splice(struct list_head *add, struct list_head *head)
-{
-	/* Do nothing if the list which gets added is empty. */
-	if (add != add->next) {
-		add->next->prev = head;
-		add->prev->next = head->next;
-		head->next->prev = add->prev;
-		head->next = add->next;
-	}
+    /* Do nothing if the list which gets added is empty. */ if (add != add->next)
+    {
+        add->next->prev = head;
+        add->prev->next = head->next;
+        head->next->prev = add->prev;
+        head->next = add->next;
+    }
 }
 
 /* Get typed element from list at a given position. */
@@ -151,57 +132,43 @@ static inline void list_splice(struct list_head *add, struct list_head *head)
 		pos != (head); \
 		pos = p, p = pos->prev)
 
-static inline int list_empty(struct list_head *head)
-{
-	return head == head->next;
-}
+static inline int list_empty(struct list_head * head) { return head == head->next; }
 
-static inline void list_replace_init(struct list_head *old,
-				     struct list_head *newp)
+static inline void list_replace_init(struct list_head * old, struct list_head * newp)
 {
-	struct list_head *head = old->next;
+    struct list_head * head = old->next;
 
-	list_del(old);
-	list_add_tail(newp, head);
-	INIT_LIST_HEAD(old);
+    list_del(old);
+    list_add_tail(newp, head);
+    INIT_LIST_HEAD(old);
 }
 
 /*
  * This is exactly the same as a normal list_head, except that it can be
  * declared volatile (e.g., if you have a list that may be accessed from signal
  * handlers).
- */
-struct volatile_list_head {
-	volatile struct volatile_list_head *next, *prev;
+ */ struct volatile_list_head
+{
+    volatile struct volatile_list_head * next, * prev;
 };
-
 #define VOLATILE_LIST_HEAD(name) \
 	volatile struct volatile_list_head name = { &(name), &(name) }
 
-static inline void __volatile_list_del(volatile struct volatile_list_head *prev,
-				       volatile struct volatile_list_head *next)
+static inline void __volatile_list_del(volatile struct volatile_list_head * prev, volatile struct volatile_list_head * next)
 {
-	next->prev = prev;
-	prev->next = next;
+    next->prev = prev;
+    prev->next = next;
 }
 
-static inline void volatile_list_del(volatile struct volatile_list_head *elem)
-{
-	__volatile_list_del(elem->prev, elem->next);
-}
+static inline void volatile_list_del(volatile struct volatile_list_head * elem) { __volatile_list_del(elem->prev, elem->next); }
 
-static inline int volatile_list_empty(volatile struct volatile_list_head *head)
-{
-	return head == head->next;
-}
+static inline int volatile_list_empty(volatile struct volatile_list_head * head) { return head == head->next; }
 
-static inline void volatile_list_add(volatile struct volatile_list_head *newp,
-				     volatile struct volatile_list_head *head)
+static inline void volatile_list_add(volatile struct volatile_list_head * newp, volatile struct volatile_list_head * head)
 {
-	head->next->prev = newp;
-	newp->next = head->next;
-	newp->prev = head;
-	head->next = newp;
+    head->next->prev = newp;
+    newp->next = head->next;
+    newp->prev = head;
+    head->next = newp;
 }
-
 #endif /* LIST_H */

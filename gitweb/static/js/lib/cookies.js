@@ -1,16 +1,11 @@
 /**
  * @fileOverview Accessing cookies from JavaScript
  * @license GPLv2 or later
- */
-
-/*
+ */ /*
  * Based on subsection "Cookies in JavaScript" of "Professional
  * JavaScript for Web Developers" by Nicholas C. Zakas and cookie
  * plugin from jQuery (dual licensed under the MIT and GPL licenses)
- */
-
-
-/**
+ */ /**
  * Create a cookie with the given name and value,
  * and other optional parameters.
  *
@@ -38,45 +33,40 @@
  * @param {Boolean} [options.secure] If true, the secure attribute of the cookie will be set
  *                                   and the cookie would be accessible only from secure sites
  *                                   (cookie transmission will require secure protocol like HTTPS).
- */
-function setCookie(sName, sValue, options) {
-	options = options || {};
-	if (sValue === null) {
-		sValue = '';
-		option.expires = 'delete';
-	}
+ */ function setCookie
+(
+    sName, sValue, options
+)
+{
+    options = options || {};
+    if (sValue === null) { sValue = ''; option.expires = 'delete'; }
 
-	var sCookie = sName + '=' + encodeURIComponent(sValue);
+    var sCookie = sName + '=' + encodeURIComponent(sValue);
 
-	if (options.expires) {
-		var oExpires = options.expires, sDate;
-		if (oExpires === 'delete') {
-			sDate = 'Thu, 01 Jan 1970 00:00:00 GMT';
-		} else if (typeof oExpires === 'string') {
-			sDate = oExpires;
-		} else {
-			var oDate;
-			if (typeof oExpires === 'number') {
-				oDate = new Date();
-				oDate.setTime(oDate.getTime() + (oExpires * 24 * 60 * 60 * 1000)); // days to ms
-			} else {
-				oDate = oExpires;
-			}
-			sDate = oDate.toGMTString();
-		}
-		sCookie += '; expires=' + sDate;
-	}
+    if (options.expires)
+    {
+        var oExpires = options.expires, sDate;
+        if (oExpires === 'delete') { sDate = 'Thu, 01 Jan 1970 00:00:00 GMT'; }
+        else if (typeof oExpires === 'string') { sDate = oExpires; }
+        else
+        {
+            var oDate;
+            if (typeof oExpires === 'number')
+            {
+                oDate = new Date();
+                oDate.setTime(oDate.getTime() + (oExpires * 24 * 60 * 60 * 1000));
+                // days to ms
+            }
+            else { oDate = oExpires; }
+            sDate = oDate.toGMTString();
+        }
+        sCookie += '; expires=' + sDate;
+    }
 
-	if (options.path) {
-		sCookie += '; path=' + (options.path);
-	}
-	if (options.domain) {
-		sCookie += '; domain=' + (options.domain);
-	}
-	if (options.secure) {
-		sCookie += '; secure';
-	}
-	document.cookie = sCookie;
+    if (options.path) { sCookie += '; path=' + (options.path); }
+    if (options.domain) { sCookie += '; domain=' + (options.domain); }
+    if (options.secure) { sCookie += '; secure'; }
+    document.cookie = sCookie;
 }
 
 /**
@@ -84,15 +74,14 @@ function setCookie(sName, sValue, options) {
  *
  * @param {String} sName: Unique name of a cookie (letters, numbers, underscores)
  * @returns {String|null} The string value stored in a cookie
- */
-function getCookie(sName) {
-	var sRE = '(?:; )?' + sName + '=([^;]*);?';
-	var oRE = new RegExp(sRE);
-	if (oRE.test(document.cookie)) {
-		return decodeURIComponent(RegExp['$1']);
-	} else {
-		return null;
-	}
+ */ function getCookie
+(
+    sName
+)
+{
+    var sRE = '(?:; )?' + sName + '=([^;]*);?';
+    var oRE = new RegExp(sRE);
+    if (oRE.test(document.cookie)) { return decodeURIComponent(RegExp['$1']); } else { return null; }
 }
 
 /**
@@ -103,12 +92,10 @@ function getCookie(sName) {
  *                           to provide optional cookie attributes.
  * @param {String} [options.path]   Must be the same as when setting a cookie
  * @param {String} [options.domain] Must be the same as when setting a cookie
- */
-function deleteCookie(sName, options) {
-	options = options || {};
-	options.expires = 'delete';
-
-	setCookie(sName, '', options);
-}
+ */ function deleteCookie
+(
+    sName, options
+)
+{ options = options || {}; options.expires = 'delete'; setCookie(sName, '', options); }
 
 /* end of cookies.js */

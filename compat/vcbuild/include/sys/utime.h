@@ -11,24 +11,15 @@
  * warranties of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *
  * You are free to use this package and its code without limitation.
- */
-
-/*
+ */ /*
  * Structure used by _utime function.
- */
-struct _utimbuf
+ */ struct _utimbuf
 {
-	time_t	actime;		/* Access time */
-	time_t	modtime;	/* Modification time */
+    time_t actime;
+/* Access time */ time_t modtime;
+/* Modification time */
 };
-
 #ifndef	_NO_OLDNAMES
-/* NOTE: Must be the same as _utimbuf above. */
-struct utimbuf
-{
-	time_t	actime;
-	time_t	modtime;
-};
+/* NOTE: Must be the same as _utimbuf above. */ struct utimbuf { time_t actime; time_t modtime; };
 #endif	/* Not _NO_OLDNAMES */
-
 #endif

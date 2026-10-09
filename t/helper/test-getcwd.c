@@ -2,25 +2,19 @@
 #include "git-compat-util.h"
 #include "parse-options.h"
 
-static const char *const getcwd_usage[] = {
-	"test-tool getcwd",
-	NULL
-};
+static const char * const getcwd_usage[] = { "test-tool getcwd", NULL };
 
-int cmd__getcwd(int argc, const char **argv)
+int cmd__getcwd(int argc, const char ** argv)
 {
-	struct option options[] = {
-		OPT_END()
-	};
-	char *cwd;
+    struct option options[] = { OPT_END() };
+    char * cwd;
 
-	argc = parse_options(argc, argv, "test-tools", options, getcwd_usage, 0);
-	if (argc > 0)
-		usage_with_options(getcwd_usage, options);
+    argc = parse_options(argc, argv, "test-tools", options, getcwd_usage, 0);
+    if (argc > 0) usage_with_options(getcwd_usage, options);
 
-	cwd = xgetcwd();
-	puts(cwd);
-	free(cwd);
+    cwd = xgetcwd();
+    puts(cwd);
+    free(cwd);
 
-	return 0;
+    return 0;
 }

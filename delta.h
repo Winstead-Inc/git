@@ -1,8 +1,7 @@
 #ifndef DELTA_H
 #define DELTA_H
 
-/* opaque object for delta index */
-struct delta_index;
+/* opaque object for delta index */ struct delta_index;
 
 /*
  * create_delta_index: compute index data from given buffer
@@ -12,23 +11,28 @@ struct delta_index;
  * is returned on failure.  The given buffer must not be freed or altered
  * before free_delta_index() is called.  The returned pointer must be freed
  * using free_delta_index().
- */
-struct delta_index *
-create_delta_index(const void *buf, size_t bufsize);
+ */ struct delta_index * create_delta_index
+(
+    const void * buf, size_t bufsize
+);
 
 /*
  * free_delta_index: free the index created by create_delta_index()
  *
  * Given pointer must be what create_delta_index() returned, or NULL.
- */
-void free_delta_index(struct delta_index *index);
+ */ void free_delta_index
+(
+    struct delta_index * index
+);
 
 /*
  * sizeof_delta_index: returns memory usage of delta index
  *
  * Given pointer must be what create_delta_index() returned, or NULL.
- */
-size_t sizeof_delta_index(struct delta_index *index);
+ */ size_t sizeof_delta_index
+(
+    struct delta_index * index
+);
 
 /*
  * create_delta: create a delta from given index for the given buffer
@@ -39,11 +43,10 @@ size_t sizeof_delta_index(struct delta_index *index);
  * On success, a non-NULL pointer to the buffer with the delta data is
  * returned and *delta_size is updated with its size.  The returned buffer
  * must be freed by the caller.
- */
-void *
-create_delta(const struct delta_index *index,
-	     const void *buf, size_t bufsize,
-	     size_t *delta_size, size_t max_delta_size);
+ */ void * create_delta
+(
+    const struct delta_index * index, const void * buf, size_t bufsize, size_t * delta_size, size_t max_delta_size
+);
 
 /*
  * diff_delta: create a delta from source buffer to target buffer
@@ -52,20 +55,14 @@ create_delta(const struct delta_index *index,
  * than max_delta_size then NULL is returned.  On success, a non-NULL
  * pointer to the buffer with the delta data is returned and *delta_size is
  * updated with its size.  The returned buffer must be freed by the caller.
- */
-static inline void *
-diff_delta(const void *src_buf, size_t src_bufsize,
-	   const void *trg_buf, size_t trg_bufsize,
-	   size_t *delta_size, size_t max_delta_size)
+ */ static inline void * diff_delta
+(
+    const void * src_buf, size_t src_bufsize, const void * trg_buf, size_t trg_bufsize, size_t * delta_size, size_t max_delta_size
+)
 {
-	struct delta_index *index = create_delta_index(src_buf, src_bufsize);
-	if (index) {
-		void *delta = create_delta(index, trg_buf, trg_bufsize,
-					   delta_size, max_delta_size);
-		free_delta_index(index);
-		return delta;
-	}
-	return NULL;
+    struct delta_index * index = create_delta_index(src_buf, src_bufsize);
+    if (index) { void * delta = create_delta(index, trg_buf, trg_bufsize, delta_size, max_delta_size); free_delta_index(index); return delta; }
+    return NULL;
 }
 
 /*
@@ -74,10 +71,10 @@ diff_delta(const void *src_buf, size_t src_bufsize,
  * On success, a non-NULL pointer to the target buffer is returned and
  * *trg_bufsize is updated with its size.  On failure a NULL pointer is
  * returned.  The returned buffer must be freed by the caller.
- */
-void *patch_delta(const void *src_buf, size_t src_size,
-		  const void *delta_buf, size_t delta_size,
-		  size_t *dst_size);
+ */ void * patch_delta
+(
+    const void * src_buf, size_t src_size, const void * delta_buf, size_t delta_size, size_t * dst_size
+);
 
 /* the smallest possible delta size is 4 bytes */
 #define DELTA_SIZE_MIN	4
@@ -85,20 +82,16 @@ void *patch_delta(const void *src_buf, size_t src_size,
 /*
  * This must be called twice on the delta data buffer, first to get the
  * expected source buffer size, and again to get the target buffer size.
- */
-static inline size_t get_delta_hdr_size(const unsigned char **datap,
-					const unsigned char *top)
+ */ static inline size_t get_delta_hdr_size
+(
+    const unsigned char ** datap, const unsigned char * top
+)
 {
-	const unsigned char *data = *datap;
-	size_t cmd, size = 0;
-	int i = 0;
-	do {
-		cmd = *data++;
-		size |= st_left_shift(cmd & 0x7f, i);
-		i += 7;
-	} while (cmd & 0x80 && data < top);
-	*datap = data;
-	return size;
+    const unsigned char * data = * datap;
+    size_t cmd, size = 0;
+    int i = 0;
+    do { cmd = * data ++ ; size |= st_left_shift(cmd & 0x7f, i); i += 7; } while (cmd & 0x80 && data < top);
+    * datap = data;
+    return size;
 }
-
 #endif

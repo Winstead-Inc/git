@@ -1,6 +1,5 @@
 env:
   CIRRUS_CLONE_DEPTH: 1
-
 freebsd_task:
   env:
     GIT_PROVE_OPTS: "--timer --jobs 10"
@@ -14,11 +13,10 @@ freebsd_task:
     image_family: freebsd-14-3
     memory: 2G
   install_script:
-    pkg install -y gettext gmake perl5
+    - pkg install -y gettext gmake perl5
   create_user_script:
-    - pw useradd git
-    - chown -R git:git .
+    - pw useradd git -chown -R git:git
   build_script:
-    - su git -c gmake
+    - su git -c "gmake"
   test_script:
-    - su git -c 'gmake test unit-tests'
+    - su git -c "gmake test unit-tests"

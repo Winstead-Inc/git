@@ -1,6 +1,5 @@
 #ifndef COMMIT_SLAB_H
 #define COMMIT_SLAB_H
-
 #include "commit-slab-decl.h"
 #include "commit-slab-impl.h"
 
@@ -58,9 +57,7 @@
  *   indegree_at() call has been made; in this case 'free_fn' is invoked
  *   with a pointer to a zero-initialized location.
  */
-
 #define define_commit_slab(slabname, elemtype) \
 	declare_commit_slab(slabname, elemtype); \
 	implement_static_commit_slab(slabname, elemtype)
-
 #endif /* COMMIT_SLAB_H */

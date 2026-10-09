@@ -1,16 +1,13 @@
 #ifndef PACK_OBJECTS_H
 #define PACK_OBJECTS_H
-
 #include "odb.h"
 #include "thread-utils.h"
 #include "pack.h"
 #include "packfile.h"
 
 struct repository;
-
 #define DEFAULT_DELTA_CACHE_SIZE       (256 * 1024 * 1024)
 #define DEFAULT_DELTA_BASE_CACHE_LIMIT (96 * 1024 * 1024)
-
 #define OE_DFS_STATE_BITS	2
 #define OE_DEPTH_BITS		12
 #define OE_IN_PACK_BITS		10
@@ -27,12 +24,9 @@ struct repository;
  *
  * The depth is measured in delta-links to the base (so if A is a delta
  * against B, then A has a depth of 1, and B a depth of 0).
- */
-enum dfs_state {
-	DFS_NONE = 0,
-	DFS_ACTIVE,
-	DFS_DONE,
-	DFS_NUM_STATES
+ */ enum dfs_state
+{
+    DFS_NONE = 0, DFS_ACTIVE, DFS_DONE, DFS_NUM_STATES
 };
 
 /*
@@ -85,266 +79,227 @@ enum dfs_state {
  *
  * [1] during try_delta phase we don't bother with compressing because
  * the delta could be quickly replaced with a better one.
- */
-struct object_entry {
-	struct pack_idx_entry idx;
-	void *delta_data;	/* cached delta (uncompressed) */
-	off_t in_pack_offset;
-	uint32_t hash;			/* name hint hash */
-	unsigned size_:OE_SIZE_BITS;
-	unsigned size_valid:1;
-	uint32_t delta_idx;	/* delta base object */
-	uint32_t delta_child_idx; /* deltified objects who bases me */
-	uint32_t delta_sibling_idx; /* other deltified objects who
+ */ struct object_entry
+{
+    struct pack_idx_entry idx;
+    void * delta_data;
+/* cached delta (uncompressed) */ off_t in_pack_offset;
+    uint32_t hash;
+/* name hint hash */ unsigned size_: OE_SIZE_BITS;
+    unsigned size_valid: 1;
+    uint32_t delta_idx;
+/* delta base object */ uint32_t delta_child_idx;
+/* deltified objects who bases me */ uint32_t delta_sibling_idx;
+/* other deltified objects who
 				     * uses the same base as me
-				     */
-	unsigned delta_size_:OE_DELTA_SIZE_BITS; /* delta data size (uncompressed) */
-	unsigned delta_size_valid:1;
-	unsigned char in_pack_header_size;
-	unsigned in_pack_idx:OE_IN_PACK_BITS;	/* already in pack */
-	unsigned z_delta_size:OE_Z_DELTA_BITS;
-	unsigned type_valid:1;
-	unsigned no_try_delta:1;
-	unsigned type_:TYPE_BITS;
-	unsigned in_pack_type:TYPE_BITS; /* could be delta */
-
-	unsigned preferred_base:1; /*
+				     */ unsigned delta_size_: OE_DELTA_SIZE_BITS;
+/* delta data size (uncompressed) */ unsigned delta_size_valid: 1;
+    unsigned char in_pack_header_size;
+    unsigned in_pack_idx: OE_IN_PACK_BITS;
+/* already in pack */ unsigned z_delta_size: OE_Z_DELTA_BITS;
+    unsigned type_valid: 1;
+    unsigned no_try_delta: 1;
+    unsigned type_: TYPE_BITS;
+    unsigned in_pack_type: TYPE_BITS;
+/* could be delta */
+    unsigned preferred_base: 1;
+/*
 				    * we do not pack this, but is available
 				    * to be used as the base object to delta
 				    * objects against.
-				    */
-	unsigned tagged:1; /* near the very tip of refs */
-	unsigned filled:1; /* assigned write-order */
-	unsigned dfs_state:OE_DFS_STATE_BITS;
-	unsigned depth:OE_DEPTH_BITS;
-	unsigned ext_base:1; /* delta_idx points outside packlist */
+				    */ unsigned tagged: 1;
+/* near the very tip of refs */ unsigned filled: 1;
+/* assigned write-order */ unsigned dfs_state: OE_DFS_STATE_BITS;
+    unsigned depth: OE_DEPTH_BITS;
+    unsigned ext_base: 1;
+/* delta_idx points outside packlist */
 };
 
 /**
  * A packing region is a section of the packing_data.objects array
  * as given by a starting index and a number of elements.
- */
-struct packing_region {
-	size_t start;
-	size_t nr;
+ */ struct packing_region
+{
+    size_t start;
+    size_t nr;
 };
 
-struct packing_data {
-	struct repository *repo;
-	struct object_entry *objects;
-	uint32_t nr_objects, nr_alloc;
+struct packing_data
+{
+    struct repository * repo;
+    struct object_entry * objects;
+    uint32_t nr_objects, nr_alloc;
 
-	struct packing_region *regions;
-	size_t nr_regions, nr_regions_alloc;
+    struct packing_region * regions;
+    size_t nr_regions, nr_regions_alloc;
 
-	int32_t *index;
-	uint32_t index_size;
+    int32_t * index;
+    uint32_t index_size;
 
-	unsigned int *in_pack_pos;
-	size_t *delta_size;
+    unsigned int * in_pack_pos;
+    size_t * delta_size;
 
-	/*
+    /*
 	 * Only one of these can be non-NULL and they have different
 	 * sizes. if in_pack_by_idx is allocated, oe_in_pack() returns
 	 * the pack of an object using in_pack_idx field. If not,
 	 * in_pack[] array is used the same way as in_pack_pos[]
-	 */
-	struct packed_git **in_pack_by_idx;
-	struct packed_git **in_pack;
+	 */ struct packed_git ** in_pack_by_idx;
+    struct packed_git ** in_pack;
 
-	/*
+    /*
 	 * During packing with multiple threads, protect the in-core
 	 * object database from concurrent accesses.
-	 */
-	pthread_mutex_t odb_lock;
+	 */ pthread_mutex_t odb_lock;
 
-	/*
+    /*
 	 * This list contains entries for bases which we know the other side
 	 * has (e.g., via reachability bitmaps), but which aren't in our
 	 * "objects" list.
-	 */
-	struct object_entry *ext_bases;
-	uint32_t nr_ext, alloc_ext;
+	 */ struct object_entry * ext_bases;
+    uint32_t nr_ext, alloc_ext;
 
-	uintmax_t oe_size_limit;
-	uintmax_t oe_delta_size_limit;
+    uintmax_t oe_size_limit;
+    uintmax_t oe_delta_size_limit;
 
-	/* delta islands */
-	unsigned int *tree_depth;
-	unsigned char *layer;
+    /* delta islands */ unsigned int * tree_depth;
+    unsigned char * layer;
 
-	/*
+    /*
 	 * Used when writing cruft packs.
 	 *
 	 * Object mtimes are stored in pack order when writing, but
 	 * written out in lexicographic (index) order.
-	 */
-	uint32_t *cruft_mtime;
+	 */ uint32_t * cruft_mtime;
 };
 
-void prepare_packing_data(struct repository *r, struct packing_data *pdata);
-void clear_packing_data(struct packing_data *pdata);
+void prepare_packing_data(struct repository * r, struct packing_data * pdata);
+void clear_packing_data(struct packing_data * pdata);
 
-/* Protect access to object database */
-static inline void packing_data_lock(struct packing_data *pdata)
+/* Protect access to object database */ static inline void packing_data_lock(struct packing_data * pdata) { pthread_mutex_lock( & pdata->odb_lock); }
+static inline void packing_data_unlock(struct packing_data * pdata) { pthread_mutex_unlock( & pdata->odb_lock); }
+
+struct object_entry * packlist_alloc(struct packing_data * pdata, const struct object_id * oid);
+
+struct object_entry * packlist_find(struct packing_data * pdata, const struct object_id * oid);
+
+static inline uint32_t pack_name_hash(const char * name)
 {
-	pthread_mutex_lock(&pdata->odb_lock);
-}
-static inline void packing_data_unlock(struct packing_data *pdata)
-{
-	pthread_mutex_unlock(&pdata->odb_lock);
-}
+    uint32_t c, hash = 0;
 
-struct object_entry *packlist_alloc(struct packing_data *pdata,
-				    const struct object_id *oid);
+    if ( ! name) return 0;
 
-struct object_entry *packlist_find(struct packing_data *pdata,
-				   const struct object_id *oid);
-
-static inline uint32_t pack_name_hash(const char *name)
-{
-	uint32_t c, hash = 0;
-
-	if (!name)
-		return 0;
-
-	/*
+    /*
 	 * This effectively just creates a sortable number from the
 	 * last sixteen non-whitespace characters. Last characters
 	 * count "most", so things that end in ".c" sort together.
-	 */
-	while ((c = *name++) != 0) {
-		if (isspace(c))
-			continue;
-		hash = (hash >> 2) + (c << 24);
-	}
-	return hash;
+	 */ while 
+    (
+(c = * name ++) != 0
+    )
+{ if (isspace(c)) continue ; hash = (hash >> 2) + (c << 24); }
+    return hash;
 }
 
-static inline uint32_t pack_name_hash_v2(const unsigned char *name)
+static inline uint32_t pack_name_hash_v2(const unsigned char * name)
 {
-	uint32_t hash = 0, base = 0, c;
+    uint32_t hash = 0, base = 0, c;
 
-	if (!name)
-		return 0;
+    if ( ! name) return 0;
 
-	while ((c = *name++)) {
-		if (isspace(c))
-			continue;
-		if (c == '/') {
-			base = (base >> 6) ^ hash;
-			hash = 0;
-		} else {
-			/*
+    while ((c = * name ++))
+    {
+        if (isspace(c)) continue;
+        if (c == '/') { base = (base >> 6) ^ hash; hash = 0; }
+        else
+        {
+            /*
 			 * 'c' is only a single byte. Reverse it and move
 			 * it to the top of the hash, moving the rest to
 			 * less-significant bits.
-			 */
-			c = (c & 0xF0) >> 4 | (c & 0x0F) << 4;
-			c = (c & 0xCC) >> 2 | (c & 0x33) << 2;
-			c = (c & 0xAA) >> 1 | (c & 0x55) << 1;
-			hash = (hash >> 2) + (c << 24);
-		}
-	}
-	return (base >> 6) ^ hash;
+			 */ c = 
+            (
+                c & 0xF0
+            )
+            >> 4 | (c & 0x0F) << 4;
+            c = (c & 0xCC) >> 2 | (c & 0x33) << 2;
+            c = (c & 0xAA) >> 1 | (c & 0x55) << 1;
+            hash = (hash >> 2) + (c << 24);
+        }
+    }
+    return (base >> 6) ^ hash;
 }
 
-static inline enum object_type oe_type(const struct object_entry *e)
+static inline enum object_type oe_type(const struct object_entry * e) { return e->type_valid? e->type_: OBJ_BAD; }
+
+static inline void oe_set_type(struct object_entry * e, enum object_type type)
 {
-	return e->type_valid ? e->type_ : OBJ_BAD;
+    if (type >= OBJ_ANY) BUG("OBJ_ANY cannot be set in pack-objects code");
+
+    e->type_valid = type >= OBJ_NONE;
+    e->type_ = (unsigned) type;
 }
 
-static inline void oe_set_type(struct object_entry *e,
-			       enum object_type type)
+static inline unsigned int oe_in_pack_pos(const struct packing_data * pack, const struct object_entry * e)
 {
-	if (type >= OBJ_ANY)
-		BUG("OBJ_ANY cannot be set in pack-objects code");
-
-	e->type_valid = type >= OBJ_NONE;
-	e->type_ = (unsigned)type;
+    return pack->in_pack_pos[e - pack->objects];
 }
 
-static inline unsigned int oe_in_pack_pos(const struct packing_data *pack,
-					  const struct object_entry *e)
+static inline void oe_set_in_pack_pos(const struct packing_data * pack, const struct object_entry * e, unsigned int pos)
 {
-	return pack->in_pack_pos[e - pack->objects];
+    pack->in_pack_pos[e - pack->objects] = pos;
 }
 
-static inline void oe_set_in_pack_pos(const struct packing_data *pack,
-				      const struct object_entry *e,
-				      unsigned int pos)
+static inline struct packed_git * oe_in_pack(const struct packing_data * pack, const struct object_entry * e)
 {
-	pack->in_pack_pos[e - pack->objects] = pos;
+    if (pack->in_pack_by_idx) return pack->in_pack_by_idx[e->in_pack_idx];
+    else return pack->in_pack[e - pack->objects];
 }
 
-static inline struct packed_git *oe_in_pack(const struct packing_data *pack,
-					    const struct object_entry *e)
-{
-	if (pack->in_pack_by_idx)
-		return pack->in_pack_by_idx[e->in_pack_idx];
-	else
-		return pack->in_pack[e - pack->objects];
-}
+void oe_map_new_pack(struct packing_data * pack);
 
-void oe_map_new_pack(struct packing_data *pack);
-
-static inline void oe_set_in_pack(struct packing_data *pack,
-				  struct object_entry *e,
-				  struct packed_git *p)
+static inline void oe_set_in_pack(struct packing_data * pack, struct object_entry * e, struct packed_git * p)
 {
-	if (pack->in_pack_by_idx) {
-		if (p->index) {
-			e->in_pack_idx = p->index;
-			return;
-		}
-		/*
+    if (pack->in_pack_by_idx)
+    {
+        if (p->index) { e->in_pack_idx = p->index; return ; }
+        /*
 		 * We're accessing packs by index, but this pack doesn't have
 		 * an index (e.g., because it was added since we created the
 		 * in_pack_by_idx array). Bail to oe_map_new_pack(), which
 		 * will convert us to using the full in_pack array, and then
 		 * fall through to our in_pack handling.
-		 */
-		oe_map_new_pack(pack);
-	}
-	pack->in_pack[e - pack->objects] = p;
+		 */ oe_map_new_pack
+        (
+            pack
+        );
+    }
+    pack->in_pack[e - pack->objects] = p;
 }
 
-void oe_set_delta_ext(struct packing_data *pack,
-		      struct object_entry *e,
-		      const struct object_id *oid);
+void oe_set_delta_ext(struct packing_data * pack, struct object_entry * e, const struct object_id * oid);
 
-static inline unsigned int oe_tree_depth(struct packing_data *pack,
-					 struct object_entry *e)
+static inline unsigned int oe_tree_depth(struct packing_data * pack, struct object_entry * e)
 {
-	if (!pack->tree_depth)
-		return 0;
-	return pack->tree_depth[e - pack->objects];
+    if ( ! pack->tree_depth) return 0;
+    return pack->tree_depth[e - pack->objects];
 }
 
-static inline void oe_set_layer(struct packing_data *pack,
-				struct object_entry *e,
-				unsigned char layer)
+static inline void oe_set_layer(struct packing_data * pack, struct object_entry * e, unsigned char layer)
 {
-	if (!pack->layer)
-		CALLOC_ARRAY(pack->layer, pack->nr_alloc);
-	pack->layer[e - pack->objects] = layer;
+    if ( ! pack->layer) CALLOC_ARRAY(pack->layer, pack->nr_alloc);
+    pack->layer[e - pack->objects] = layer;
 }
 
-static inline uint32_t oe_cruft_mtime(struct packing_data *pack,
-				      struct object_entry *e)
+static inline uint32_t oe_cruft_mtime(struct packing_data * pack, struct object_entry * e)
 {
-	if (!pack->cruft_mtime)
-		return 0;
-	return pack->cruft_mtime[e - pack->objects];
+    if ( ! pack->cruft_mtime) return 0;
+    return pack->cruft_mtime[e - pack->objects];
 }
 
-static inline void oe_set_cruft_mtime(struct packing_data *pack,
-				      struct object_entry *e,
-				      uint32_t mtime)
+static inline void oe_set_cruft_mtime(struct packing_data * pack, struct object_entry * e, uint32_t mtime)
 {
-	if (!pack->cruft_mtime)
-		CALLOC_ARRAY(pack->cruft_mtime, pack->nr_alloc);
-	pack->cruft_mtime[e - pack->objects] = mtime;
+    if ( ! pack->cruft_mtime) CALLOC_ARRAY(pack->cruft_mtime, pack->nr_alloc);
+    pack->cruft_mtime[e - pack->objects] = mtime;
 }
-
 #endif

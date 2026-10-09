@@ -1,32 +1,27 @@
 #ifndef NOTES_MERGE_H
 #define NOTES_MERGE_H
-
 #include "notes-utils.h"
 #include "strbuf.h"
 
 struct commit;
 struct object_id;
 struct repository;
-
 #define NOTES_MERGE_WORKTREE "NOTES_MERGE_WORKTREE"
 
-enum notes_merge_verbosity {
-	NOTES_MERGE_VERBOSITY_DEFAULT = 2,
-	NOTES_MERGE_VERBOSITY_MAX = 5
+enum notes_merge_verbosity { NOTES_MERGE_VERBOSITY_DEFAULT = 2, NOTES_MERGE_VERBOSITY_MAX = 5 };
+
+struct notes_merge_options
+{
+    struct repository * repo;
+    const char * local_ref;
+    const char * remote_ref;
+    struct strbuf commit_msg;
+    int verbosity;
+    enum notes_merge_strategy strategy;
+    unsigned has_worktree: 1;
 };
 
-struct notes_merge_options {
-	struct repository *repo;
-	const char *local_ref;
-	const char *remote_ref;
-	struct strbuf commit_msg;
-	int verbosity;
-	enum notes_merge_strategy strategy;
-	unsigned has_worktree:1;
-};
-
-void init_notes_merge_options(struct repository *r,
-			      struct notes_merge_options *o);
+void init_notes_merge_options(struct repository * r, struct notes_merge_options * o);
 
 /*
  * Merge notes from o->remote_ref into o->local_ref
@@ -56,10 +51,10 @@ void init_notes_merge_options(struct repository *r,
  * (although not both) may refer to a non-existing notes ref, in which case
  * that notes ref is interpreted as an empty notes tree, and the merge
  * trivially results in what the other ref points to.
- */
-int notes_merge(struct notes_merge_options *o,
-		struct notes_tree *local_tree,
-		struct object_id *result_oid);
+ */ int notes_merge
+(
+    struct notes_merge_options * o, struct notes_tree * local_tree, struct object_id * result_oid
+);
 
 /*
  * Finalize conflict resolution from an earlier notes_merge()
@@ -71,17 +66,17 @@ int notes_merge(struct notes_merge_options *o,
  * This function will add the (now resolved) notes in .git/NOTES_MERGE_WORKTREE
  * to 'partial_tree', and create a final notes merge commit, the OID of which
  * will be stored in 'result_oid'.
- */
-int notes_merge_commit(struct notes_merge_options *o,
-		       struct notes_tree *partial_tree,
-		       struct commit *partial_commit,
-		       struct object_id *result_oid);
+ */ int notes_merge_commit
+(
+    struct notes_merge_options * o, struct notes_tree * partial_tree, struct commit * partial_commit, struct object_id * result_oid
+);
 
 /*
  * Abort conflict resolution from an earlier notes_merge()
  *
  * Removes the notes merge worktree in .git/NOTES_MERGE_WORKTREE.
- */
-int notes_merge_abort(struct notes_merge_options *o);
-
+ */ int notes_merge_abort
+(
+    struct notes_merge_options * o
+);
 #endif

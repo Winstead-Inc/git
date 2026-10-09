@@ -1,77 +1,57 @@
 #ifndef TRAILER_H
 #define TRAILER_H
-
 #include "list.h"
 #include "strbuf.h"
 
 struct trailer_block;
 struct strvec;
 
-enum trailer_where {
-	WHERE_DEFAULT,
-	WHERE_END,
-	WHERE_AFTER,
-	WHERE_BEFORE,
-	WHERE_START
-};
-enum trailer_if_exists {
-	EXISTS_DEFAULT,
-	EXISTS_ADD_IF_DIFFERENT_NEIGHBOR,
-	EXISTS_ADD_IF_DIFFERENT,
-	EXISTS_ADD,
-	EXISTS_REPLACE,
-	EXISTS_DO_NOTHING
-};
-enum trailer_if_missing {
-	MISSING_DEFAULT,
-	MISSING_ADD,
-	MISSING_DO_NOTHING
-};
+enum trailer_where { WHERE_DEFAULT, WHERE_END, WHERE_AFTER, WHERE_BEFORE, WHERE_START };
+enum trailer_if_exists { EXISTS_DEFAULT, EXISTS_ADD_IF_DIFFERENT_NEIGHBOR, EXISTS_ADD_IF_DIFFERENT, EXISTS_ADD, EXISTS_REPLACE, EXISTS_DO_NOTHING };
+enum trailer_if_missing { MISSING_DEFAULT, MISSING_ADD, MISSING_DO_NOTHING };
 
-int trailer_set_where(enum trailer_where *item, const char *value);
-int trailer_set_if_exists(enum trailer_if_exists *item, const char *value);
-int trailer_set_if_missing(enum trailer_if_missing *item, const char *value);
+int trailer_set_where(enum trailer_where * item, const char * value);
+int trailer_set_if_exists(enum trailer_if_exists * item, const char * value);
+int trailer_set_if_missing(enum trailer_if_missing * item, const char * value);
 
 /*
  * A list that represents newly-added trailers, such as those provided
  * with the --trailer command line option of git-interpret-trailers.
- */
-struct new_trailer_item {
-	struct list_head list;
+ */ struct new_trailer_item
+{
+    struct list_head list;
 
-	const char *text;
+    const char * text;
 
-	enum trailer_where where;
-	enum trailer_if_exists if_exists;
-	enum trailer_if_missing if_missing;
+    enum trailer_where where;
+    enum trailer_if_exists if_exists;
+    enum trailer_if_missing if_missing;
 };
 
-struct process_trailer_options {
-	int in_place;
-	int trim_empty;
-	int only_trailers;
-	int only_input;
-	int unfold;
-	int no_divider;
-	int key_only;
-	int value_only;
-	const struct strbuf *separator;
-	const struct strbuf *key_value_separator;
-	int (*filter)(const struct strbuf *, void *);
-	void *filter_data;
+struct process_trailer_options
+{
+    int in_place;
+    int trim_empty;
+    int only_trailers;
+    int only_input;
+    int unfold;
+    int no_divider;
+    int key_only;
+    int value_only;
+    const struct strbuf * separator;
+    const struct strbuf * key_value_separator;
+    int( * filter)(const struct strbuf * , void *);
+    void * filter_data;
 };
-
 #define PROCESS_TRAILER_OPTIONS_INIT {0}
 
-void parse_trailers_from_config(struct list_head *config_head);
+void parse_trailers_from_config(struct list_head * config_head);
 
-void parse_trailers_from_command_line_args(struct list_head *arg_head,
-					   struct list_head *new_trailer_head);
+void parse_trailers_from_command_line_args(struct list_head * arg_head, struct list_head * new_trailer_head);
 
-int validate_trailer_args(const struct strvec *cli_args);
+int validate_trailer_args(const struct strvec * cli_args);
 
-void process_trailers_lists(struct list_head *head,
-			    struct list_head *arg_head);
+void process_trailers_lists(struct list_head * head, struct list_head * arg_head);
 
 /*
  * Given some input string "str", return a pointer to an opaque trailer_block
@@ -102,49 +82,46 @@ void process_trailers_lists(struct list_head *head,
  * data but as a linked list of trailer_item objects). This API does not perform
  * any synchronization between the two. In the future we should be able to
  * reduce the duplication and use just the linked list.
- */
-struct trailer_block *parse_trailers(const struct process_trailer_options *,
-				     const char *str,
-				     struct list_head *trailer_objects);
+ */ struct trailer_block * parse_trailers
+(
+    const struct process_trailer_options * , const char * str, struct list_head * trailer_objects
+);
 
 /*
  * Return the offset of the start of the trailer block. That is, 0 is the start
  * of the input ("str" in parse_trailers()) and some other positive number
  * indicates how many bytes we have to skip over before we get to the beginning
  * of the trailer block.
- */
-size_t trailer_block_start(struct trailer_block *);
+ */ size_t trailer_block_start
+(
+    struct trailer_block * 
+);
 
 /*
  * Return the end of the trailer block, again relative to the start of the
  * input.
- */
-size_t trailer_block_end(struct trailer_block *);
+ */ size_t trailer_block_end(struct trailer_block *);
 
 /*
  * Return 1 if the trailer block had an extra newline (blank line) just before
  * it.
- */
-int blank_line_before_trailer_block(struct trailer_block *);
+ */ int blank_line_before_trailer_block(struct trailer_block *);
 
 /*
  * Free trailer_block struct.
- */
-void trailer_block_release(struct trailer_block *);
+ */ void trailer_block_release(struct trailer_block *);
 
 void trailer_config_init(void);
-void format_trailers(const struct process_trailer_options *,
-		     struct list_head *trailers,
-		     struct strbuf *out);
+void format_trailers(const struct process_trailer_options * , struct list_head * trailers, struct strbuf * out);
 void free_trailers(struct list_head *);
 
 /*
  * Convenience function to format the trailers from the commit msg "msg" into
  * the strbuf "out". Reuses format_trailers() internally.
- */
-void format_trailers_from_commit(const struct process_trailer_options *,
-				 const char *msg,
-				 struct strbuf *out);
+ */ void format_trailers_from_commit
+(
+    const struct process_trailer_options * , const char * msg, struct strbuf * out
+);
 
 /*
  * An interface for iterating over the trailers found in a particular commit
@@ -155,23 +132,19 @@ void format_trailers_from_commit(const struct process_trailer_options *,
  *   while (trailer_iterator_advance(&iter))
  *      ... do something with iter.key and iter.val ...
  *   trailer_iterator_release(&iter);
- */
-struct trailer_iterator {
-	/*
+ */ struct trailer_iterator
+{
+    /*
 	 * Raw line (e.g., "foo: bar baz") before being parsed as a trailer
 	 * key/val pair as part of a trailer block (as the "key" and "val"
 	 * fields below). If a line fails to parse as a trailer, then the "key"
 	 * will be the entire line and "val" will be the empty string.
-	 */
-	const char *raw;
-	struct strbuf key;
-	struct strbuf val;
+	 */ const char * raw;
+    struct strbuf key;
+    struct strbuf val;
 
-	/* private */
-	struct {
-		struct trailer_block *trailer_block;
-		size_t cur;
-	} internal;
+    /* private */ struct { struct trailer_block * trailer_block; size_t cur; }
+    internal;
 };
 
 /*
@@ -181,30 +154,34 @@ struct trailer_iterator {
  *
  * After initializing, note that key/val will not yet point to any trailer.
  * Call advance() to parse the first one (if any).
- */
-void trailer_iterator_init(struct trailer_iterator *iter, const char *msg);
+ */ void trailer_iterator_init
+(
+    struct trailer_iterator * iter, const char * msg
+);
 
 /*
  * Advance to the next trailer of the iterator. Returns 0 if there is no such
  * trailer, and 1 otherwise. The key and value of the trailer can be
  * fetched from the iter->key and iter->value fields (which are valid
  * only until the next advance).
- */
-int trailer_iterator_advance(struct trailer_iterator *iter);
+ */ int trailer_iterator_advance
+(
+    struct trailer_iterator * iter
+);
 
 /*
  * Release all resources associated with the trailer iteration.
- */
-void trailer_iterator_release(struct trailer_iterator *iter);
+ */ void trailer_iterator_release(struct trailer_iterator * iter);
 
 /*
  * Append trailers specified in trailer_args to buf in-place.
  *
  * Each element of trailer_args should be in the same format as the value
  * accepted by --trailer=<trailer> (i.e., without the --trailer= prefix).
- */
-int amend_strbuf_with_trailers(struct strbuf *buf,
-				const struct strvec *trailer_args);
+ */ int amend_strbuf_with_trailers
+(
+    struct strbuf * buf, const struct strvec * trailer_args
+);
 
 /*
  * Augment a file by appending trailers specified in trailer_args.
@@ -213,14 +190,18 @@ int amend_strbuf_with_trailers(struct strbuf *buf,
  * accepted by --trailer=<trailer> (i.e., without the --trailer= prefix).
  *
  * Returns 0 on success or a non-zero error code on failure.
- */
-int amend_file_with_trailers(const char *path, const struct strvec *trailer_args);
+ */ int amend_file_with_trailers
+(
+    const char * path, const struct strvec * trailer_args
+);
 
 /*
  * Create a tempfile ""git-interpret-trailers-XXXXXX" in the same
  * directory as file.
- */
-struct tempfile *trailer_create_in_place_tempfile(const char *file);
+ */ struct tempfile * trailer_create_in_place_tempfile
+(
+    const char * file
+);
 
 /*
  * Rewrite the contents of input by processing its trailer block according to
@@ -228,8 +209,8 @@ struct tempfile *trailer_create_in_place_tempfile(const char *file);
  *
  * The rewritten message is appended to out (callers should strbuf_reset()
  * first if needed).
- */
-void process_trailers(const struct process_trailer_options *opts,
-		      struct list_head *new_trailer_head,
-		      struct strbuf *input, struct strbuf *out);
+ */ void process_trailers
+(
+    const struct process_trailer_options * opts, struct list_head * new_trailer_head, struct strbuf * input, struct strbuf * out
+);
 #endif /* TRAILER_H */

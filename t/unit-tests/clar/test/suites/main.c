@@ -4,7 +4,6 @@
  * This file is part of clar, distributed under the ISC license.
  * For full terms see the included COPYING file.
  */
-
 #include "clar.h"
 
 /*
@@ -16,12 +15,9 @@
  * suite.  If you want to check the return value of the test application,
  * your main() should return the same value returned by clar_test().
  */
-
 #ifdef _WIN32
-int __cdecl main(int argc, char *argv[])
+int __cdecl main(int argc, char * argv[])
 #else
-int main(int argc, char *argv[])
+int main(int argc, char * argv[])
 #endif
-{
-	return clar_test(argc, argv);
-}
+{ return clar_test(argc, argv); }

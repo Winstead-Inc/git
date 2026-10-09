@@ -26,9 +26,7 @@
  *
  * Keep any symbols in date order of when their support was
  * introduced, oldest first, in the official version of cURL library.
- */
-
-/**
+ */ /**
  * curl_url() interface added in 7.62.0 (October 2018)
  */
 #if LIBCURL_VERSION_NUM >= 0x073e00
@@ -81,5 +79,4 @@
 #if LIBCURL_VERSION_NUM >= 0x080D00
 #define GIT_CURL_HAVE_CURLOPT_UPLOAD_FLAGS
 #endif
-
 #endif

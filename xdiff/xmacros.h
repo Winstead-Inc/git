@@ -19,13 +19,8 @@
  *  Davide Libenzi <davidel@xmailserver.org>
  *
  */
-
 #if !defined(XMACROS_H)
 #define XMACROS_H
-
-
-
-
 #define XDL_MIN(a, b) ((a) < (b) ? (a): (b))
 #define XDL_MAX(a, b) ((a) > (b) ? (a): (b))
 #define XDL_ABS(v) ((v) >= 0 ? (v): -(v))
@@ -67,5 +62,4 @@ do { \
 #define XDL_ALLOC_GROW(p, nr, alloc)	\
 	(-!((nr) <= (alloc) ||		\
 	    ((p) = xdl_alloc_grow_helper((p), (nr), &(alloc), sizeof(*(p))))))
-
 #endif /* #if !defined(XMACROS_H) */

@@ -1,4 +1,5 @@
-static const struct interval zero_width[] = {
+static const struct interval zero_width[] = 
+{
 { 0x0300, 0x036F },
 { 0x0483, 0x0489 },
 { 0x0591, 0x05BD },
@@ -376,7 +377,8 @@ static const struct interval zero_width[] = {
 { 0xE0020, 0xE007F },
 { 0xE0100, 0xE01EF }
 };
-static const struct interval double_width[] = {
+static const struct interval double_width[] = 
+{
 { 0x1100, 0x115F },
 { 0x231A, 0x231B },
 { 0x2329, 0x232A },

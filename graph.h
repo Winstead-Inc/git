@@ -97,10 +97,7 @@
  * | | | | *
  * ------------
  *
- */
-
-/* A graph is a pointer to this opaque structure */
-struct git_graph;
+ */ /* A graph is a pointer to this opaque structure */ struct git_graph;
 
 /*
  * Called to setup global display of line_prefix diff option.
@@ -111,8 +108,10 @@ struct git_graph;
  * regardless of whether a graph has actually been setup. The normal graph
  * flow will honor the exact diff_options passed, but a NULL graph will cause
  * display of a line_prefix to stdout.
- */
-void graph_setup_line_prefix(struct diff_options *diffopt);
+ */ void graph_setup_line_prefix
+(
+    struct diff_options * diffopt
+);
 
 /*
  * Set up a custom scheme for column colors.
@@ -131,18 +130,18 @@ void graph_setup_line_prefix(struct diff_options *diffopt);
  *
  * NOTE: This function isn't used in Git outside graph.c but it is used
  * by CGit (https://git.zx2c4.com/cgit/) to use HTML for colors.
- */
-void graph_set_column_colors(const char **colors, unsigned short colors_max);
+ */ void graph_set_column_colors
+(
+    const char ** colors, unsigned short colors_max
+);
 
 /*
  * Create a new struct git_graph.
- */
-struct git_graph *graph_init(struct rev_info *opt);
+ */ struct git_graph * graph_init(struct rev_info * opt);
 
 /*
  * Free a struct git_graph.
- */
-void graph_clear(struct git_graph *graph);
+ */ void graph_clear(struct git_graph * graph);
 
 /*
  * Update a git_graph with a new commit.
@@ -167,8 +166,10 @@ void graph_clear(struct git_graph *graph);
  *
  * - `graph_update()` may be used on a pruned set of commits only if the parent list
  *   has been rewritten so as to include only ancestors from the pruned set.
- */
-void graph_update(struct git_graph *graph, struct commit *commit);
+ */ void graph_update
+(
+    struct git_graph * graph, struct commit * commit
+);
 
 /*
  * Determine if a graph has finished outputting lines for the current
@@ -183,8 +184,10 @@ void graph_update(struct git_graph *graph, struct commit *commit);
  * If `graph_update()` is called before all lines for the current commit have
  * been printed, the next call to `graph_next_line()` will output an ellipsis,
  * to indicate that a portion of the graph was omitted.
- */
-int graph_is_commit_finished(struct git_graph const *graph);
+ */ int graph_is_commit_finished
+(
+    struct git_graph const * graph
+);
 
 /*
  * Output the next line for a graph.
@@ -197,45 +200,50 @@ int graph_is_commit_finished(struct git_graph const *graph);
  *
  * NOTE: This function isn't used in Git outside graph.c but it is used
  * by CGit (https://git.zx2c4.com/cgit/) to wrap HTML around graph lines.
- */
-int graph_next_line(struct git_graph *graph, struct strbuf *sb);
-
+ */ int graph_next_line
+(
+    struct git_graph * graph, struct strbuf * sb
+);
 
 /*
  * Return current width of the graph in on-screen characters.
- */
-int graph_width(struct git_graph *graph);
+ */ int graph_width(struct git_graph * graph);
 
 /*
  * graph_show_*: helper functions for printing to stdout
- */
-
-
-/*
+ */ /*
  * If the graph is non-NULL, print the history graph to stdout,
  * up to and including the line containing this commit.
  * Does not print a terminating newline on the last line.
- */
-void graph_show_commit(struct git_graph *graph);
+ */ void graph_show_commit
+(
+    struct git_graph * graph
+);
 
 /*
  * If the graph is non-NULL, print one line of the history graph to stdout.
  * Does not print a terminating newline on the last line.
- */
-void graph_show_oneline(struct git_graph *graph);
+ */ void graph_show_oneline
+(
+    struct git_graph * graph
+);
 
 /*
  * If the graph is non-NULL, print one line of vertical graph padding to
  * stdout.  Does not print a terminating newline on the last line.
- */
-void graph_show_padding(struct git_graph *graph);
+ */ void graph_show_padding
+(
+    struct git_graph * graph
+);
 
 /*
  * If the graph is non-NULL, print the rest of the history graph for this
  * commit to stdout.  Does not print a terminating newline on the last line.
  * Returns 1 if output was printed, and 0 if no output was necessary.
- */
-int graph_show_remainder(struct git_graph *graph);
+ */ int graph_show_remainder
+(
+    struct git_graph * graph
+);
 
 /*
  * Print a commit message strbuf and the remainder of the graph to stdout.
@@ -257,26 +265,28 @@ int graph_show_remainder(struct git_graph *graph);
  * handle directly. It is assumed that this is the same file handle as the
  * file specified by the graph diff options. This is necessary so that
  * graph_show_commit_msg can be called even with a NULL graph.
- */
-void graph_show_commit_msg(struct git_graph *graph,
-			   FILE *file,
-			   struct strbuf const *sb);
+ */ void graph_show_commit_msg
+(
+    struct git_graph * graph, FILE * file, struct strbuf const * sb
+);
 
 /*
  * Pop the first commit from the graph's lookahead buffer.
  * Returns NULL if the buffer is empty.
- */
-struct commit *graph_pop_lookahead(struct git_graph *graph);
+ */ struct commit * graph_pop_lookahead
+(
+    struct git_graph * graph
+);
 
 /*
  * Returns how many more commits can be added to the lookahead buffer.
- */
-int graph_get_lookahead_room(struct git_graph *graph);
+ */ int graph_get_lookahead_room(struct git_graph * graph);
 
 /*
  * Push a commit into the lookahead buffer. Must only be called when
  * graph_get_lookahead_room() returns > 0.
- */
-void graph_push_lookahead(struct git_graph *graph, struct commit *c);
-
+ */ void graph_push_lookahead
+(
+    struct git_graph * graph, struct commit * c
+);
 #endif /* GRAPH_H */

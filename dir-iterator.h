@@ -1,6 +1,5 @@
 #ifndef DIR_ITERATOR_H
 #define DIR_ITERATOR_H
-
 #include "strbuf.h"
 
 /*
@@ -44,9 +43,7 @@
  * Callers are allowed to modify iter->path while they are working,
  * but they must restore it to its original contents before calling
  * dir_iterator_advance() again.
- */
-
-/*
+ */ /*
  * Flags for dir_iterator_begin:
  *
  * - DIR_ITERATOR_PEDANTIC: override dir-iterator's default behavior
@@ -61,24 +58,21 @@
 #define DIR_ITERATOR_PEDANTIC (1 << 0)
 #define DIR_ITERATOR_SORTED   (1 << 1)
 
-struct dir_iterator {
-	/* The current path: */
-	struct strbuf path;
+struct dir_iterator
+{
+    /* The current path: */ struct strbuf path;
 
-	/*
+    /*
 	 * The current path relative to the starting path. This part
 	 * of the path always uses "/" characters to separate path
 	 * components:
-	 */
-	const char *relative_path;
+	 */ const char * relative_path;
 
-	/* The current basename: */
-	const char *basename;
+    /* The current basename: */ const char * basename;
 
-	/*
+    /*
 	 * The result of calling lstat() on path.
-	 */
-	struct stat st;
+	 */ struct stat st;
 };
 
 /*
@@ -94,8 +88,10 @@ struct dir_iterator {
  *  - path is the starting directory. An internal copy will be made.
  *  - flags is a combination of the possible flags to initialize a
  *    dir-iterator or 0 for default behavior.
- */
-struct dir_iterator *dir_iterator_begin(const char *path, unsigned int flags);
+ */ struct dir_iterator * dir_iterator_begin
+(
+    const char * path, unsigned int flags
+);
 
 /*
  * Advance the iterator to the first or next item and return ITER_OK.
@@ -105,10 +101,10 @@ struct dir_iterator *dir_iterator_begin(const char *path, unsigned int flags);
  * It is a bug to use iterator or call this function again after it
  * has returned ITER_DONE or ITER_ERROR (which may be returned iff
  * the DIR_ITERATOR_PEDANTIC flag was set).
- */
-int dir_iterator_advance(struct dir_iterator *iterator);
+ */ int dir_iterator_advance
+(
+    struct dir_iterator * iterator
+);
 
-/* Free the dir_iterator and any associated resources. */
-void dir_iterator_free(struct dir_iterator *iterator);
-
+/* Free the dir_iterator and any associated resources. */ void dir_iterator_free(struct dir_iterator * iterator);
 #endif

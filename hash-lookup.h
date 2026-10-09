@@ -1,12 +1,9 @@
 #ifndef HASH_LOOKUP_H
 #define HASH_LOOKUP_H
 
-typedef const struct object_id *oid_access_fn(size_t index, const void *table);
+typedef const struct object_id * oid_access_fn(size_t index, const void * table);
 
-int oid_pos(const struct object_id *oid,
-	    const void *table,
-	    size_t nr,
-	    oid_access_fn fn);
+int oid_pos(const struct object_id * oid, const void * table, size_t nr, oid_access_fn fn);
 
 /*
  * Searches for hash in table, using the given fanout table to determine the
@@ -26,7 +23,8 @@ int oid_pos(const struct object_id *oid,
  *    element that is greater than hash (if the search is not successful)
  *
  * This function does not verify the validity of the fanout table.
- */
-int bsearch_hash(const unsigned char *hash, const uint32_t *fanout_nbo,
-		 const unsigned char *table, size_t stride, uint32_t *result);
+ */ int bsearch_hash
+(
+    const unsigned char * hash, const uint32_t * fanout_nbo, const unsigned char * table, size_t stride, uint32_t * result
+);
 #endif
