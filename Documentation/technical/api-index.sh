@@ -8,7 +8,6 @@ fi
 
 SOURCE_DIR="$1"
 OUTPUT="$2"
-
 (
 	cd "$SOURCE_DIR"
 

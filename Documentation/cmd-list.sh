@@ -2,7 +2,8 @@
 
 set -e
 
-format_one () {
+format_one ()
+{
 	source_dir="$1"
 	command="$2"
 	attributes="$3"

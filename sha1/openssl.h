@@ -3,7 +3,8 @@
 #define SHA1_OPENSSL_H
 #include <openssl/evp.h>
 
-struct openssl_SHA1_CTX {
+struct openssl_SHA1_CTX
+{
 	EVP_MD_CTX *ectx;
 };
 
